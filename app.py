@@ -112,7 +112,7 @@ def html_payload(frame: pd.DataFrame) -> dict:
     }
 
 
-def render_html_dashboard(frame: pd.DataFrame) -> bool:
+def render_html_dashboard(frame: pd.DataFrame, user_role: str) -> bool:
     template_path = Path(__file__).resolve().parent / "assets" / "panel_template.html"
     if not template_path.is_file():
         st.warning("El panel visual está actualizándose. Mientras tanto, puede utilizar el Resumen ejecutivo.")
@@ -121,6 +121,7 @@ def render_html_dashboard(frame: pd.DataFrame) -> bool:
     base_url = "https://recursos-fisicos-ssmocc.streamlit.app/"
     rendered = template.replace("__DASHBOARD_DATA__", json.dumps(html_payload(frame), ensure_ascii=False, default=str))
     rendered = rendered.replace("__APP_BASE_URL__", base_url)
+    rendered = rendered.replace("__USER_ROLE__", json.dumps(str(user_role), ensure_ascii=False))
     components.html(rendered, height=1450, scrolling=True)
     return True
 
@@ -243,7 +244,7 @@ if user["role"] not in {"Administrador", "Dirección", "Consulta"} and user.get(
     data = data[data["owner_unit"].fillna("").str.lower() == user["unit"].lower()]
 
 if section == "Panel visual HTML":
-    render_html_dashboard(data)
+    render_html_dashboard(data, str(user["role"]))
 
 elif section == "Resumen ejecutivo":
     st.subheader("Resumen ejecutivo")
