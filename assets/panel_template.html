@@ -196,6 +196,7 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
     <button class="btn teal" id="upload">Cargar planilla</button>
     <button class="btn ghost" id="reports">Generar informe</button>
     <button class="btn" id="export">Exportar CSV</button>
+    <button class="btn ghost" id="logout">Cerrar sesión</button>
   </div>
   <div class="reportmenu" id="reportmenu">
     <button data-report="gerencial">Informe gerencial<small>KPIs, alertas y decisiones requeridas</small></button>
@@ -476,6 +477,7 @@ function init(){
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tab(t.dataset.t);if(t.dataset.t==='obras')renderObras();if(t.dataset.t==='conv')renderConv();});
   $('#scrim').onclick=closeDrawer;$('#dclose').onclick=closeDrawer;
   $('#export').onclick=exportCSV;
+  $('#logout').onclick=()=>{window.top.location.href='?logout=1'};
   $('#upload').onclick=()=>{window.top.location.href='?view=administracion'};
   $('#reports').onclick=e=>{e.stopPropagation();$('#reportmenu').classList.toggle('open')};
   $('#reportmenu').querySelectorAll('button').forEach(b=>b.onclick=()=>{report(b.dataset.report);$('#reportmenu').classList.remove('open')});document.addEventListener('click',()=>$('#reportmenu').classList.remove('open'));
