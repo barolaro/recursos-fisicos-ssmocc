@@ -22,6 +22,7 @@ PROJECT_HEADERS = [
     "stage", "status", "funding", "progress", "owner_unit", "responsible",
     "start_date", "end_date", "contract_end", "guarantee_end", "current_tasks",
     "next_steps", "comments", "updated_at", "updated_by",
+    "grupo", "m2", "rate", "guarantee_civil_end", "commitment",
 ]
 USER_HEADERS = ["username", "display_name", "role", "unit", "active", "password_hash"]
 AUDIT_HEADERS = ["id", "project_id", "action", "detail", "changed_at", "changed_by"]
@@ -102,7 +103,7 @@ def read_projects() -> pd.DataFrame:
     if frame.empty:
         return frame
     frame["progress"] = pd.to_numeric(frame["progress"], errors="coerce")
-    for column in ["start_date", "end_date", "contract_end", "guarantee_end", "updated_at"]:
+    for column in ["start_date", "end_date", "contract_end", "guarantee_end", "guarantee_civil_end", "updated_at"]:
         frame[column] = pd.to_datetime(frame[column], errors="coerce")
     return frame.sort_values("name", key=lambda s: s.astype(str).str.lower()).reset_index(drop=True)
 
