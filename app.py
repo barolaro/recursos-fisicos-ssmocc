@@ -17,6 +17,9 @@ st.set_page_config(page_title="Recursos Físicos SSMOC", page_icon="🏥", layou
 st.markdown("""
 <style>
 .block-container{padding-top:1.5rem;max-width:1500px}.hero{padding:1.4rem 1.6rem;border-radius:18px;color:white;background:linear-gradient(120deg,#075985,#0f766e);margin-bottom:1rem}.hero h1{margin:0;font-size:2rem}.hero p{margin:.35rem 0 0;opacity:.88}.stMetric{background:white;border:1px solid #e5e7eb;padding:1rem;border-radius:14px}.badge{display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#dbeafe;color:#1e3a8a;font-weight:700;font-size:.78rem}
+[data-testid="stSidebar"], [data-testid="collapsedControl"]{display:none!important}
+[data-testid="stAppViewContainer"] > .main{margin-left:0!important}
+.block-container{max-width:1660px;padding-left:1rem;padding-right:1rem}
 </style>
 """, unsafe_allow_html=True)
 
@@ -112,6 +115,16 @@ with st.sidebar:
     if user["role"] != "Administrador" and user.get("unit"):
         st.caption(f'Unidad: {user["unit"]}')
     section = st.radio("Navegación", ["Panel visual HTML", "Resumen ejecutivo", "Cartera de proyectos", "Actualizar proyecto", "Administración"] if user["role"] == "Administrador" else ["Panel visual HTML", "Resumen ejecutivo", "Cartera de proyectos", "Actualizar proyecto"] if user["role"] not in {"Dirección", "Consulta"} else ["Panel visual HTML", "Resumen ejecutivo", "Cartera de proyectos"])
+
+# La interfaz pública abre directamente el panel HTML. El administrador puede
+# abrir temporalmente una vista de gestión mediante ?view=administracion.
+requested_view = str(st.query_params.get("view", "panel")).lower()
+admin_views = {
+    "panel": "Panel visual HTML", "resumen": "Resumen ejecutivo",
+    "cartera": "Cartera de proyectos", "actualizar": "Actualizar proyecto",
+    "administracion": "Administración",
+}
+section = admin_views.get(requested_view, "Panel visual HTML") if user["role"] == "Administrador" else "Panel visual HTML"
 
 data = read_projects()
 if user["role"] not in {"Administrador", "Dirección", "Consulta"} and user.get("unit"):
