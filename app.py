@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# Despliegue sincronizado: app e importador deben cargarse desde el mismo commit.
+
 import json
 from datetime import date, datetime, timezone
 from pathlib import Path
