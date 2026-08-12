@@ -11,7 +11,7 @@ import streamlit.components.v1 as components
 
 from services import google_sheets
 from services.database import (
-    backend_name, delete_demo_projects, get_user, init_db, read_projects,
+    authenticate_user, backend_name, delete_demo_projects, init_db, read_projects,
     read_users, replace_users, upsert_projects,
 )
 from services.importer import PROJECT_COLUMNS, parse_workbook
@@ -33,18 +33,6 @@ def secret(name: str, default: str = "") -> str:
         return str(st.secrets[name])
     except (KeyError, FileNotFoundError):
         return default
-
-
-def identity() -> tuple[str, str] | None:
-    try:
-        if st.user.is_logged_in:
-            return str(st.user.email), str(getattr(st.user, "name", st.user.email))
-    except Exception:
-        pass
-    if google_sheets.configured():
-        return None
-    email = secret("ADMIN_EMAIL", "admin@demo.local")
-    return email, "Modo demostración"
 
 
 def days_status(value) -> str:
@@ -105,23 +93,28 @@ def render_html_dashboard(frame: pd.DataFrame) -> bool:
 
 
 init_db()
-signed_identity = identity()
-if signed_identity is None:
+if "auth_user" not in st.session_state:
     st.markdown('<div class="hero"><h1>Acceso protegido</h1><p>Panel de Recursos Físicos · SSMOC</p></div>', unsafe_allow_html=True)
-    st.info("Debe iniciar sesión con una cuenta Google previamente autorizada por el Administrador.")
-    try:
-        if st.button("Iniciar sesión con Google", type="primary"):
-            st.login()
-    except Exception:
-        st.error("La autenticación institucional aún no está configurada en los Secrets de Streamlit.")
+    with st.form("login", clear_on_submit=False):
+        username = st.text_input("Usuario").strip().lower()
+        password = st.text_input("Contraseña", type="password")
+        submitted = st.form_submit_button("Ingresar", type="primary", use_container_width=True)
+    if submitted:
+        authenticated = authenticate_user(username, password)
+        if authenticated:
+            st.session_state.auth_user = authenticated
+            st.rerun()
+        else:
+            st.error("Usuario o contraseña incorrectos.")
     st.stop()
-email, display_name = signed_identity
-user = get_user(email, secret("ADMIN_EMAIL", "admin@demo.local"))
-if not user.get("active", True):
-    st.error("Su cuenta no está autorizada o se encuentra deshabilitada. Solicite acceso al Administrador del sistema.")
-    st.stop()
+user = st.session_state.auth_user
+email = str(user.get("username", ""))
+display_name = str(user.get("display_name", email))
 
 st.markdown('<div class="hero"><h1>Panel de Recursos Físicos</h1><p>Seguimiento integrado de obras, inversiones, compromisos y alertas · SSMOC</p></div>', unsafe_allow_html=True)
+if st.button("Cerrar sesión"):
+    del st.session_state.auth_user
+    st.rerun()
 
 with st.sidebar:
     st.markdown("### Sesión")
@@ -241,18 +234,23 @@ elif section == "Administración":
     with users_tab:
         users = read_users()
         if users.empty:
-            users = pd.DataFrame([{"email": email, "display_name": display_name, "role": "Administrador", "unit": "Administración", "active": True}])
+            users = pd.DataFrame(columns=["username", "display_name", "role", "unit", "active", "password_hash"])
+        visible_users = users.drop(columns=["password_hash"], errors="ignore").copy()
+        visible_users["password"] = ""
         edited_users = st.data_editor(
-            users, num_rows="dynamic", hide_index=True, use_container_width=True,
+            visible_users, num_rows="dynamic", hide_index=True, use_container_width=True,
             column_config={
+                "username": st.column_config.TextColumn("Usuario", required=True),
+                "password": st.column_config.TextColumn("Nueva contraseña", help="Déjela vacía para conservar la actual."),
                 "role": st.column_config.SelectboxColumn("Perfil", options=["Administrador", "Obras", "Inversiones", "Planificación", "Dirección", "Consulta"], required=True),
                 "unit": st.column_config.SelectboxColumn("Unidad", options=["Administración", "Obras", "Inversiones", "Planificación", "Dirección", "Consulta"]),
                 "active": st.column_config.CheckboxColumn("Activo"),
             },
         )
-        st.caption("Cada correo solo podrá visualizar o actualizar la unidad asignada. Dirección y Consulta no pueden modificar proyectos.")
+        st.caption("Cada usuario solo podrá visualizar o actualizar la unidad asignada. Las contraseñas se guardan como hash y nunca quedan visibles.")
         if st.button("Guardar usuarios y permisos", type="primary"):
-            replace_users(edited_users, email)
+            prepared = edited_users.rename(columns={"password": "password_hash"})
+            replace_users(prepared, email)
             st.success("Usuarios y perfiles actualizados.")
 
 st.caption(f"Última visualización: {datetime.now(timezone.utc).strftime('%d-%m-%Y %H:%M UTC')} · Los permisos de edición se validan en el servidor.")
