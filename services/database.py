@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import bcrypt
 from sqlalchemy import create_engine, inspect, text
 
 from services import google_sheets
@@ -123,22 +124,29 @@ def get_user(email: str, admin_email: str) -> dict:
     return {"email": email, "display_name": email.split("@")[0], "role": "Consulta", "unit": "", "active": True}
 
 
+def authenticate_user(username: str, password: str) -> dict | None:
+    username = username.strip().lower()
+    admin_username = str(st.secrets.get("ADMIN_USERNAME", "admin")).strip().lower()
+    admin_password = str(st.secrets.get("ADMIN_PASSWORD", ""))
+    if username == admin_username and admin_password and password == admin_password:
+        return {"username": username, "display_name": "Administrador", "role": "Administrador", "unit": "Administración", "active": True}
+    if google_sheets.configured():
+        return google_sheets.authenticate(username, password)
+    return None
+
+
 def read_users() -> pd.DataFrame:
     if google_sheets.configured():
         return google_sheets.read_users()
     if not inspect(engine()).has_table("users"):
-        return pd.DataFrame(columns=["email", "display_name", "role", "unit", "active"])
-    return pd.read_sql(text("SELECT email, display_name, role, unit, active FROM users ORDER BY email"), engine())
+        return pd.DataFrame(columns=["username", "display_name", "role", "unit", "active", "password_hash"])
+    return pd.DataFrame(columns=["username", "display_name", "role", "unit", "active", "password_hash"])
 
 
 def replace_users(frame: pd.DataFrame, actor: str) -> int:
     if google_sheets.configured():
         return google_sheets.replace_users(frame, actor)
-    users = frame[["email", "display_name", "role", "unit", "active"]].copy()
-    with engine().begin() as conn:
-        conn.execute(text("DELETE FROM users"))
-    users.to_sql("users", engine(), if_exists="append", index=False)
-    return len(users)
+    return 0
 
 
 def delete_demo_projects() -> None:
