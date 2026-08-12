@@ -9,6 +9,12 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine, inspect, text
 
+from services import google_sheets
+
+
+def backend_name() -> str:
+    return "Google Sheets" if google_sheets.configured() else "Base SQL local"
+
 
 def _database_url() -> str:
     try:
@@ -54,6 +60,9 @@ SCHEMA = [
 
 
 def init_db() -> None:
+    if google_sheets.configured():
+        google_sheets.initialize()
+        return
     with engine().begin() as conn:
         for statement in SCHEMA:
             conn.execute(text(statement))
@@ -68,12 +77,16 @@ def init_db() -> None:
 
 
 def read_projects() -> pd.DataFrame:
+    if google_sheets.configured():
+        return google_sheets.read_projects()
     if not inspect(engine()).has_table("projects"):
         return pd.DataFrame()
     return pd.read_sql(text("SELECT * FROM projects ORDER BY name"), engine())
 
 
 def upsert_projects(frame: pd.DataFrame, actor: str) -> int:
+    if google_sheets.configured():
+        return google_sheets.upsert_projects(frame, actor)
     if frame.empty:
         return 0
     frame = frame.copy()
@@ -99,9 +112,37 @@ def get_user(email: str, admin_email: str) -> dict:
     email = email.lower().strip()
     if email == admin_email.lower().strip():
         return {"email": email, "display_name": "Administrador", "role": "Administrador", "unit": "Administración", "active": True}
+    if google_sheets.configured():
+        user = google_sheets.get_user(email)
+        return user or {"email": email, "display_name": email.split("@")[0], "role": "Sin acceso", "unit": "", "active": False}
     if inspect(engine()).has_table("users"):
         with engine().connect() as conn:
             row = conn.execute(text("SELECT email, display_name, role, unit, active FROM users WHERE LOWER(email)=:email"), {"email": email}).mappings().first()
             if row:
                 return dict(row)
     return {"email": email, "display_name": email.split("@")[0], "role": "Consulta", "unit": "", "active": True}
+
+
+def read_users() -> pd.DataFrame:
+    if google_sheets.configured():
+        return google_sheets.read_users()
+    if not inspect(engine()).has_table("users"):
+        return pd.DataFrame(columns=["email", "display_name", "role", "unit", "active"])
+    return pd.read_sql(text("SELECT email, display_name, role, unit, active FROM users ORDER BY email"), engine())
+
+
+def replace_users(frame: pd.DataFrame, actor: str) -> int:
+    if google_sheets.configured():
+        return google_sheets.replace_users(frame, actor)
+    users = frame[["email", "display_name", "role", "unit", "active"]].copy()
+    with engine().begin() as conn:
+        conn.execute(text("DELETE FROM users"))
+    users.to_sql("users", engine(), if_exists="append", index=False)
+    return len(users)
+
+
+def delete_demo_projects() -> None:
+    if google_sheets.configured():
+        return
+    with engine().begin() as conn:
+        conn.execute(text("DELETE FROM projects WHERE id LIKE 'demo-%'"))
