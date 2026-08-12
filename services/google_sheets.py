@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timezone
 
 import gspread
+import bcrypt
 import pandas as pd
 import streamlit as st
 from google.oauth2.service_account import Credentials
@@ -21,7 +22,7 @@ PROJECT_HEADERS = [
     "start_date", "end_date", "contract_end", "guarantee_end", "current_tasks",
     "next_steps", "comments", "updated_at", "updated_by",
 ]
-USER_HEADERS = ["email", "display_name", "role", "unit", "active"]
+USER_HEADERS = ["username", "display_name", "role", "unit", "active", "password_hash"]
 AUDIT_HEADERS = ["id", "project_id", "action", "detail", "changed_at", "changed_by"]
 CATALOG_HEADERS = ["catalog", "value", "active"]
 
@@ -53,8 +54,20 @@ def _worksheet(title: str, headers: list[str]):
     if not first:
         sheet.update(values=[headers], range_name="A1")
         sheet.freeze(rows=1)
+    elif title == USER_SHEET and first == ["email", "display_name", "role", "unit", "active"]:
+        rows = sheet.get_all_values()[1:]
+        migrated = [headers] + [[*(row + [""] * 5)[:5], ""] for row in rows]
+        sheet.clear()
+        sheet.update(values=migrated, range_name="A1")
+        sheet.freeze(rows=1)
     elif first != headers:
-        raise ValueError(f"La hoja {title} no tiene la estructura esperada.")
+        # Migración segura: agrega las columnas nuevas sin borrar registros.
+        missing = [header for header in headers if header not in first]
+        if missing:
+            sheet.update(values=[first + missing], range_name="A1")
+            first += missing
+        if first != headers:
+            raise ValueError(f"La hoja {title} no tiene la estructura esperada.")
     return sheet
 
 
@@ -119,9 +132,17 @@ def read_users() -> pd.DataFrame:
 
 
 def replace_users(frame: pd.DataFrame, actor: str) -> int:
+    current = read_users()
+    old_hashes = {} if current.empty else dict(zip(current["username"].astype(str).str.lower(), current["password_hash"]))
     users = frame.reindex(columns=USER_HEADERS).copy()
-    users["email"] = users["email"].astype(str).str.strip().str.lower()
-    users = users[users["email"].str.contains("@", na=False)].drop_duplicates("email")
+    users["username"] = users["username"].astype(str).str.strip().str.lower()
+    users = users[users["username"].str.len() >= 3].drop_duplicates("username")
+    for index, row in users.iterrows():
+        password = str(row.get("password_hash", "")).strip()
+        if password and not password.startswith("$2"):
+            users.at[index, "password_hash"] = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+        elif not password:
+            users.at[index, "password_hash"] = old_hashes.get(row["username"], "")
     values = [USER_HEADERS] + [[_clean(row.get(col)) for col in USER_HEADERS] for _, row in users.iterrows()]
     sheet = _worksheet(USER_SHEET, USER_HEADERS)
     sheet.clear()
@@ -133,14 +154,24 @@ def replace_users(frame: pd.DataFrame, actor: str) -> int:
     return len(users)
 
 
-def get_user(email: str) -> dict | None:
+def get_user(username: str) -> dict | None:
     users = read_users()
     if users.empty:
         return None
-    match = users[users["email"].astype(str).str.lower().str.strip() == email.lower().strip()]
+    match = users[users["username"].astype(str).str.lower().str.strip() == username.lower().strip()]
     if match.empty:
         return None
     row = match.iloc[0].to_dict()
     row["active"] = str(row.get("active", "")).lower() in {"true", "verdadero", "1", "si", "sí", "x"}
     return row
 
+
+def authenticate(username: str, password: str) -> dict | None:
+    user = get_user(username)
+    if not user or not user.get("active"):
+        return None
+    stored = str(user.get("password_hash", ""))
+    try:
+        return user if stored and bcrypt.checkpw(password.encode(), stored.encode()) else None
+    except ValueError:
+        return None
