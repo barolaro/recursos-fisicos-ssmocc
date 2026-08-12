@@ -84,10 +84,15 @@ def html_payload(frame: pd.DataFrame) -> dict:
     }
 
 
-def render_html_dashboard(frame: pd.DataFrame) -> None:
-    template = (Path(__file__).parent / "assets" / "panel_template.html").read_text(encoding="utf-8")
+def render_html_dashboard(frame: pd.DataFrame) -> bool:
+    template_path = Path(__file__).resolve().parent / "assets" / "panel_template.html"
+    if not template_path.is_file():
+        st.warning("El panel visual está actualizándose. Mientras tanto, puede utilizar el Resumen ejecutivo.")
+        return False
+    template = template_path.read_text(encoding="utf-8")
     rendered = template.replace("__DASHBOARD_DATA__", json.dumps(html_payload(frame), ensure_ascii=False, default=str))
     components.html(rendered, height=1450, scrolling=True)
+    return True
 
 
 init_db()
