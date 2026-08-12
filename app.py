@@ -118,7 +118,9 @@ def render_html_dashboard(frame: pd.DataFrame) -> bool:
         st.warning("El panel visual está actualizándose. Mientras tanto, puede utilizar el Resumen ejecutivo.")
         return False
     template = template_path.read_text(encoding="utf-8")
+    base_url = "https://recursos-fisicos-ssmocc.streamlit.app/"
     rendered = template.replace("__DASHBOARD_DATA__", json.dumps(html_payload(frame), ensure_ascii=False, default=str))
+    rendered = rendered.replace("__APP_BASE_URL__", base_url)
     components.html(rendered, height=1450, scrolling=True)
     return True
 
@@ -357,7 +359,10 @@ elif section == "Nuevo proyecto":
 elif section == "Administración":
     st.subheader("Administración del sistema")
     st.caption(f"Fuente de datos activa: {backend_name()}")
-    load_tab, users_tab = st.tabs(["Carga de proyectos", "Usuarios y perfiles"])
+    if str(st.query_params.get("tab", "")).lower() == "usuarios":
+        users_tab, load_tab = st.tabs(["Usuarios y perfiles", "Carga de proyectos"])
+    else:
+        load_tab, users_tab = st.tabs(["Carga de proyectos", "Usuarios y perfiles"])
     with load_tab:
         st.caption("Acepta la Matriz completa (multihoja), la Planilla de Inversiones o la Planilla de Obras. El sistema reconoce automáticamente cada hoja.")
         st.markdown("#### Descargar formatos modelo")
