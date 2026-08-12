@@ -108,9 +108,9 @@ init_db()
 signed_identity = identity()
 if signed_identity is None:
     st.markdown('<div class="hero"><h1>Acceso protegido</h1><p>Panel de Recursos Físicos · SSMOC</p></div>', unsafe_allow_html=True)
-    st.info("Debe iniciar sesión con una cuenta previamente autorizada por el Administrador.")
+    st.info("Debe iniciar sesión con una cuenta Google previamente autorizada por el Administrador.")
     try:
-        if st.button("Iniciar sesión", type="primary"):
+        if st.button("Iniciar sesión con Google", type="primary"):
             st.login()
     except Exception:
         st.error("La autenticación institucional aún no está configurada en los Secrets de Streamlit.")
