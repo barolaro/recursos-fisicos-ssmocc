@@ -4,9 +4,19 @@ Aplicación Streamlit para el seguimiento autogestionado de proyectos de Obras, 
 
 ## Carga de información
 
-El panel admite dos vías, ambas desde la sesión de Administrador (o unidades con permiso de edición):
+El panel es **autogestionado**: se puede crear, editar y eliminar registros directamente en el panel visual (sin abrir otra ventana), además de la carga masiva y manual desde Streamlit.
 
-**Carga masiva (Administración → Carga de proyectos).** Sube uno de estos archivos `.xlsx` y el sistema reconoce automáticamente cada hoja:
+### Autogestión dentro del panel HTML
+
+Con perfil Administrador, Obras o Inversiones, cada pestaña (Cartera, Obras, Convenio) muestra:
+
+- Un botón **+ Nuevo** para crear un registro mediante un formulario en modal.
+- Una columna **Acciones** con editar (✎) y eliminar (🗑) por fila.
+- En Cartera, el detalle de cada proyecto incluye botones Editar/Eliminar.
+
+Las eliminaciones piden confirmación explícita y los cambios se guardan en el navegador (localStorage), por lo que persisten al recargar. Desde **Generar informe** se puede **Descargar respaldo (JSON)** o **Restaurar datos del servidor** (descarta los cambios locales). Los perfiles Dirección y Consulta ven el panel en solo lectura. Nota: la edición in-panel opera sobre una copia de trabajo del navegador; la escritura definitiva a la base (Google Sheets/SQL) se realiza desde la carga masiva o manual de Streamlit.
+
+### Carga masiva (Administración → Carga de proyectos)
 
 - `00_MATRIZ_PROYECTOS_2026.xlsx` — matriz completa: hoja de Inversión, Planificación (se omite si duplica a Inversión) y Convenio de Programación.
 - `Planilla_Inversiones.xlsx` — cartera de inversión con compromisos de octubre.
@@ -14,7 +24,9 @@ El panel admite dos vías, ambas desde la sesión de Administrador (o unidades c
 
 El importador detecta la fila de encabezados aunque haya banners o columnas en blanco, descarta filas separadoras de grupo, normaliza los códigos BIP y adjunta los compromisos del convenio por código BIP. Antes de confirmar se muestra un resumen por Cartera / Obras / Convenio.
 
-**Carga manual (Nuevo proyecto).** Formulario para registrar un proyecto individual. Si el código BIP y el nombre coinciden con uno existente, se actualiza en lugar de duplicarse.
+### Carga manual (Nuevo proyecto)
+
+Formulario en Streamlit para registrar un proyecto individual. Si el código BIP y el nombre coinciden con uno existente, se actualiza en lugar de duplicarse.
 
 Cada registro alimenta las tres pestañas del panel visual: Cartera de Inversión (grupos A–G, RATE, etapa, estado, financiamiento), Obras y Contratos (vigencias y garantías con semáforo) y Convenio de Programación (compromisos por BIP).
 
