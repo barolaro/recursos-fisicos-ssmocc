@@ -9,7 +9,11 @@ import plotly.express as px
 import streamlit as st
 import streamlit.components.v1 as components
 
-from services.database import get_user, init_db, read_projects, upsert_projects
+from services import google_sheets
+from services.database import (
+    backend_name, delete_demo_projects, get_user, init_db, read_projects,
+    read_users, replace_users, upsert_projects,
+)
 from services.importer import PROJECT_COLUMNS, parse_workbook
 
 
@@ -31,12 +35,14 @@ def secret(name: str, default: str = "") -> str:
         return default
 
 
-def identity() -> tuple[str, str]:
+def identity() -> tuple[str, str] | None:
     try:
         if st.user.is_logged_in:
             return str(st.user.email), str(getattr(st.user, "name", st.user.email))
     except Exception:
         pass
+    if google_sheets.configured():
+        return None
     email = secret("ADMIN_EMAIL", "admin@demo.local")
     return email, "Modo demostración"
 
@@ -99,10 +105,20 @@ def render_html_dashboard(frame: pd.DataFrame) -> bool:
 
 
 init_db()
-email, display_name = identity()
+signed_identity = identity()
+if signed_identity is None:
+    st.markdown('<div class="hero"><h1>Acceso protegido</h1><p>Panel de Recursos Físicos · SSMOC</p></div>', unsafe_allow_html=True)
+    st.info("Debe iniciar sesión con una cuenta previamente autorizada por el Administrador.")
+    try:
+        if st.button("Iniciar sesión", type="primary"):
+            st.login()
+    except Exception:
+        st.error("La autenticación institucional aún no está configurada en los Secrets de Streamlit.")
+    st.stop()
+email, display_name = signed_identity
 user = get_user(email, secret("ADMIN_EMAIL", "admin@demo.local"))
 if not user.get("active", True):
-    st.error("El usuario se encuentra deshabilitado.")
+    st.error("Su cuenta no está autorizada o se encuentra deshabilitada. Solicite acceso al Administrador del sistema.")
     st.stop()
 
 st.markdown('<div class="hero"><h1>Panel de Recursos Físicos</h1><p>Seguimiento integrado de obras, inversiones, compromisos y alertas · SSMOC</p></div>', unsafe_allow_html=True)
@@ -119,12 +135,21 @@ with st.sidebar:
 # La interfaz pública abre directamente el panel HTML. El administrador puede
 # abrir temporalmente una vista de gestión mediante ?view=administracion.
 requested_view = str(st.query_params.get("view", "panel")).lower()
-admin_views = {
+views = {
     "panel": "Panel visual HTML", "resumen": "Resumen ejecutivo",
     "cartera": "Cartera de proyectos", "actualizar": "Actualizar proyecto",
     "administracion": "Administración",
 }
-section = admin_views.get(requested_view, "Panel visual HTML") if user["role"] == "Administrador" else "Panel visual HTML"
+allowed_by_role = {
+    "Administrador": set(views),
+    "Obras": {"panel", "cartera", "actualizar"},
+    "Inversiones": {"panel", "cartera", "actualizar"},
+    "Planificación": {"panel", "cartera", "actualizar"},
+    "Dirección": {"panel", "resumen", "cartera"},
+    "Consulta": {"panel", "cartera"},
+}
+allowed = allowed_by_role.get(str(user["role"]), {"panel"})
+section = views.get(requested_view, "Panel visual HTML") if requested_view in allowed else "Panel visual HTML"
 
 data = read_projects()
 if user["role"] not in {"Administrador", "Dirección", "Consulta"} and user.get("unit"):
@@ -194,25 +219,40 @@ elif section == "Actualizar proyecto":
                 st.cache_data.clear()
 
 elif section == "Administración":
-    st.subheader("Administración y carga masiva")
-    st.warning("Antes de cargar información real, configure PostgreSQL y mantenga el repositorio sin archivos institucionales.")
-    uploaded = st.file_uploader("Cargar Matriz, Planilla de Obras o Planilla de Inversiones", type=["xlsx"])
-    if uploaded:
-        try:
-            preview = parse_workbook(uploaded.getvalue())
-            st.success(f"Se reconocieron {len(preview)} proyectos.")
-            st.dataframe(preview[["bip", "name", "stage", "status", "owner_unit"]].head(30), hide_index=True, use_container_width=True)
-            replace_demo = st.checkbox("Eliminar registros de demostración después de cargar")
-            if st.button("Confirmar carga", type="primary"):
-                upsert_projects(preview, email)
-                if replace_demo:
-                    from services.database import engine
-                    from sqlalchemy import text
-                    with engine().begin() as conn:
-                        conn.execute(text("DELETE FROM projects WHERE id LIKE 'demo-%'"))
-                st.success("Carga finalizada correctamente.")
-                st.rerun()
-        except Exception as exc:
-            st.error(f"No se pudo procesar la planilla: {exc}")
+    st.subheader("Administración del sistema")
+    st.caption(f"Fuente de datos activa: {backend_name()}")
+    load_tab, users_tab = st.tabs(["Carga de proyectos", "Usuarios y perfiles"])
+    with load_tab:
+        uploaded = st.file_uploader("Cargar Matriz, Planilla de Obras o Planilla de Inversiones", type=["xlsx"])
+        if uploaded:
+            try:
+                preview = parse_workbook(uploaded.getvalue())
+                st.success(f"Se reconocieron {len(preview)} proyectos.")
+                st.dataframe(preview[["bip", "name", "stage", "status", "owner_unit"]].head(30), hide_index=True, use_container_width=True)
+                replace_demo = st.checkbox("Eliminar registros de demostración después de cargar")
+                if st.button("Confirmar carga", type="primary"):
+                    upsert_projects(preview, email)
+                    if replace_demo:
+                        delete_demo_projects()
+                    st.success("Carga finalizada correctamente.")
+                    st.rerun()
+            except Exception as exc:
+                st.error(f"No se pudo procesar la planilla: {exc}")
+    with users_tab:
+        users = read_users()
+        if users.empty:
+            users = pd.DataFrame([{"email": email, "display_name": display_name, "role": "Administrador", "unit": "Administración", "active": True}])
+        edited_users = st.data_editor(
+            users, num_rows="dynamic", hide_index=True, use_container_width=True,
+            column_config={
+                "role": st.column_config.SelectboxColumn("Perfil", options=["Administrador", "Obras", "Inversiones", "Planificación", "Dirección", "Consulta"], required=True),
+                "unit": st.column_config.SelectboxColumn("Unidad", options=["Administración", "Obras", "Inversiones", "Planificación", "Dirección", "Consulta"]),
+                "active": st.column_config.CheckboxColumn("Activo"),
+            },
+        )
+        st.caption("Cada correo solo podrá visualizar o actualizar la unidad asignada. Dirección y Consulta no pueden modificar proyectos.")
+        if st.button("Guardar usuarios y permisos", type="primary"):
+            replace_users(edited_users, email)
+            st.success("Usuarios y perfiles actualizados.")
 
 st.caption(f"Última visualización: {datetime.now(timezone.utc).strftime('%d-%m-%Y %H:%M UTC')} · Los permisos de edición se validan en el servidor.")
