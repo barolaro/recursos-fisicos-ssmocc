@@ -18,13 +18,15 @@ from services.database import (
 from services.importer import PROJECT_COLUMNS, make_id, parse_workbook
 
 
-st.set_page_config(page_title="Recursos Físicos SSMOC", page_icon="🏥", layout="wide")
+st.set_page_config(page_title="Recursos Físicos SSMOC", page_icon="🏥", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""
 <style>
 .block-container{padding-top:1.5rem;max-width:1500px}.hero{padding:1.4rem 1.6rem;border-radius:16px;color:white;background:linear-gradient(120deg,#082349,#0C4C97 60%,#1E6FBF 130%);border-left:6px solid #DA2A2E;margin-bottom:1rem;box-shadow:0 12px 30px rgba(8,35,73,.18)}.hero h1{margin:0;font-size:2rem}.hero p{margin:.35rem 0 0;opacity:.9}.stMetric{background:white;border:1px solid #e5e7eb;border-top:3px solid #1E6FBF;padding:1rem;border-radius:12px}.badge{display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#E9F1FA;color:#0C2E5E;font-weight:700;font-size:.78rem}
 [data-testid="stSidebar"], [data-testid="collapsedControl"]{display:none!important}
+[data-testid="stHeader"], [data-testid="stToolbar"], #MainMenu, footer{display:none!important}
 [data-testid="stAppViewContainer"] > .main{margin-left:0!important}
 .block-container{max-width:1660px;padding-left:1rem;padding-right:1rem}
+.login-brand{text-align:center;padding:1rem .5rem .25rem}.login-brand img{width:150px;max-width:50%;border-radius:6px}.login-brand .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#1E6FBF;margin:.75rem 0 .35rem}.login-brand h1{font-size:1.65rem;line-height:1.15;color:#082349;margin:0}.login-brand p{color:#687386;margin:.55rem 0}.login-foot{text-align:center;color:#7A8699;font-size:.72rem;padding:.4rem 0 0}
 </style>
 """, unsafe_allow_html=True)
 
@@ -163,12 +165,27 @@ def model_workbook(kind: str) -> bytes:
 
 
 init_db()
+if str(st.query_params.get("logout", "")) == "1":
+    st.session_state.pop("auth_user", None)
+    st.query_params.clear()
+    st.rerun()
+
 if "auth_user" not in st.session_state:
-    st.markdown('<div class="hero"><h1>Acceso protegido</h1><p>Panel de Recursos Físicos · SSMOC</p></div>', unsafe_allow_html=True)
-    with st.form("login", clear_on_submit=False):
-        username = st.text_input("Usuario").strip().lower()
-        password = st.text_input("Contraseña", type="password")
-        submitted = st.form_submit_button("Ingresar", type="primary", use_container_width=True)
+    st.markdown("<style>.block-container{max-width:100%!important;padding:4vh 1rem!important;background:linear-gradient(135deg,#F4F7FB,#E9F1FA);min-height:100vh}</style>", unsafe_allow_html=True)
+    _, login_col, _ = st.columns([1, 1.15, 1])
+    with login_col:
+        with st.container(border=True):
+            st.markdown('''<div class="login-brand">
+              <img src="https://gestordocumentalhsjd.ceropapel.cl/archivos/publico//logos/logo3.jpg" alt="Servicio de Salud Metropolitano Occidente">
+              <div class="eyebrow">Servicio de Salud Metropolitano Occidente</div>
+              <h1>Panel de Recursos Físicos</h1>
+              <p>Departamento de Planificación · Acceso protegido</p>
+            </div>''', unsafe_allow_html=True)
+            with st.form("login", clear_on_submit=False):
+                username = st.text_input("Usuario", placeholder="Ingrese su usuario").strip().lower()
+                password = st.text_input("Contraseña", type="password", placeholder="Ingrese su contraseña")
+                submitted = st.form_submit_button("Ingresar", type="primary", use_container_width=True)
+            st.markdown('<div class="login-foot">Sistema autogestionado · Las credenciales se validan de forma segura en el servidor.</div>', unsafe_allow_html=True)
     if submitted:
         authenticated = authenticate_user(username, password)
         if authenticated:
@@ -180,18 +197,17 @@ if "auth_user" not in st.session_state:
 user = st.session_state.auth_user
 email = str(user.get("username", ""))
 display_name = str(user.get("display_name", email))
+requested_view = str(st.query_params.get("view", "panel")).lower()
 
-st.markdown('<div class="hero"><h1>Panel de Recursos Físicos</h1><p>Seguimiento integrado de obras, inversiones, compromisos y alertas · SSMOC</p></div>', unsafe_allow_html=True)
-if st.button("Cerrar sesión"):
-    del st.session_state.auth_user
-    st.rerun()
-
-if user["role"] == "Administrador":
-    st.caption("Acciones de administración")
-    action_a, action_b, action_c = st.columns(3)
-    action_a.link_button("📤 Cargar planilla", "?view=administracion", use_container_width=True)
-    action_b.link_button("✍️ Ingreso manual", "?view=nuevo", use_container_width=True)
-    action_c.link_button("📊 Volver al panel", "?view=panel", use_container_width=True)
+if requested_view == "panel":
+    st.markdown("<style>.block-container{max-width:100%!important;padding:0!important}iframe{display:block;width:100%!important;border:0!important}</style>", unsafe_allow_html=True)
+else:
+    st.markdown('<div class="hero"><h1>Gestión de Recursos Físicos</h1><p>Administración, carga y actualización de información · SSMOC</p></div>', unsafe_allow_html=True)
+    nav_a, nav_b, nav_c = st.columns(3)
+    nav_a.link_button("📊 Panel", "?view=panel", use_container_width=True)
+    nav_b.link_button("📤 Carga masiva", "?view=administracion", use_container_width=True)
+    nav_c.link_button("✍️ Ingreso manual", "?view=nuevo", use_container_width=True)
+    st.link_button("Cerrar sesión", "?logout=1")
 
 with st.sidebar:
     st.markdown("### Sesión")
@@ -204,7 +220,6 @@ with st.sidebar:
 
 # La interfaz pública abre directamente el panel HTML. El administrador puede
 # abrir temporalmente una vista de gestión mediante ?view=administracion.
-requested_view = str(st.query_params.get("view", "panel")).lower()
 views = {
     "panel": "Panel visual HTML", "resumen": "Resumen ejecutivo",
     "cartera": "Cartera de proyectos", "actualizar": "Actualizar proyecto",
