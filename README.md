@@ -2,6 +2,22 @@
 
 Aplicación Streamlit para el seguimiento autogestionado de proyectos de Obras, Inversiones y Planificación del Servicio de Salud Metropolitano Occidente.
 
+## Carga de información
+
+El panel admite dos vías, ambas desde la sesión de Administrador (o unidades con permiso de edición):
+
+**Carga masiva (Administración → Carga de proyectos).** Sube uno de estos archivos `.xlsx` y el sistema reconoce automáticamente cada hoja:
+
+- `00_MATRIZ_PROYECTOS_2026.xlsx` — matriz completa: hoja de Inversión, Planificación (se omite si duplica a Inversión) y Convenio de Programación.
+- `Planilla_Inversiones.xlsx` — cartera de inversión con compromisos de octubre.
+- `Planilla_Obras.xlsx` — contratos, fechas de término, garantías (fiel cumplimiento y responsabilidad civil) y siguientes etapas.
+
+El importador detecta la fila de encabezados aunque haya banners o columnas en blanco, descarta filas separadoras de grupo, normaliza los códigos BIP y adjunta los compromisos del convenio por código BIP. Antes de confirmar se muestra un resumen por Cartera / Obras / Convenio.
+
+**Carga manual (Nuevo proyecto).** Formulario para registrar un proyecto individual. Si el código BIP y el nombre coinciden con uno existente, se actualiza en lugar de duplicarse.
+
+Cada registro alimenta las tres pestañas del panel visual: Cartera de Inversión (grupos A–G, RATE, etapa, estado, financiamiento), Obras y Contratos (vigencias y garantías con semáforo) y Convenio de Programación (compromisos por BIP).
+
 ## Funcionalidades
 
 - Dashboard ejecutivo y acciones prioritarias.
