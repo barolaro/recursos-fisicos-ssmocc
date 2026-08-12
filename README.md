@@ -5,6 +5,7 @@ Aplicación Streamlit para el seguimiento autogestionado de proyectos de Obras, 
 ## Funcionalidades
 
 - Dashboard ejecutivo y acciones prioritarias.
+- Panel HTML original integrado como vista principal y alimentado desde la base central.
 - Cartera filtrable y exportable.
 - Perfiles: Administrador, Obras, Inversiones, Planificación, Dirección y Consulta.
 - Edición limitada a la unidad del usuario.
@@ -37,4 +38,3 @@ No se deben subir planillas, bases de datos, credenciales ni documentos instituc
 ## Flujo de datos
 
 El Administrador carga la matriz desde la aplicación. Los usuarios autorizados actualizan solamente los proyectos de su unidad; Dirección y Consulta mantienen acceso de lectura. Cada actualización queda registrada en `audit_log`.
-
