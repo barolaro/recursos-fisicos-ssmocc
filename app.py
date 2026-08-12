@@ -16,7 +16,7 @@ from services.importer import PROJECT_COLUMNS, parse_workbook
 st.set_page_config(page_title="Recursos Físicos SSMOC", page_icon="🏥", layout="wide")
 st.markdown("""
 <style>
-.block-container{padding-top:1.5rem;max-width:1500px}.hero{padding:1.4rem 1.6rem;border-radius:18px;color:white;background:linear-gradient(120deg,#075985,#0f766e);margin-bottom:1rem}.hero h1{margin:0;font-size:2rem}.hero p{margin:.35rem 0 0;opacity:.88}.stMetric{background:white;border:1px solid #e5e7eb;padding:1rem;border-radius:14px}.badge{display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#dbeafe;color:#1e3a8a;font-weight:700;font-size:.78rem}
+.block-container{padding-top:1.5rem;max-width:1500px}.hero{padding:1.4rem 1.6rem;border-radius:16px;color:white;background:linear-gradient(120deg,#082349,#0C4C97 60%,#1E6FBF 130%);border-left:6px solid #DA2A2E;margin-bottom:1rem;box-shadow:0 12px 30px rgba(8,35,73,.18)}.hero h1{margin:0;font-size:2rem}.hero p{margin:.35rem 0 0;opacity:.9}.stMetric{background:white;border:1px solid #e5e7eb;border-top:3px solid #1E6FBF;padding:1rem;border-radius:12px}.badge{display:inline-block;padding:.2rem .65rem;border-radius:99px;background:#E9F1FA;color:#0C2E5E;font-weight:700;font-size:.78rem}
 [data-testid="stSidebar"], [data-testid="collapsedControl"]{display:none!important}
 [data-testid="stAppViewContainer"] > .main{margin-left:0!important}
 .block-container{max-width:1660px;padding-left:1rem;padding-right:1rem}
