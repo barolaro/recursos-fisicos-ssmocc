@@ -14,7 +14,7 @@ from services.database import (
     authenticate_user, backend_name, delete_demo_projects, init_db, read_projects,
     read_users, replace_users, upsert_projects,
 )
-from services.importer import PROJECT_COLUMNS, parse_workbook
+from services.importer import PROJECT_COLUMNS, make_id, parse_workbook
 
 
 st.set_page_config(page_title="Recursos Físicos SSMOC", page_icon="🏥", layout="wide")
@@ -46,38 +46,66 @@ def days_status(value) -> str:
     return "Vigente"
 
 
-def html_payload(frame: pd.DataFrame) -> dict:
-    def value(row, key, default=""):
-        item = row.get(key, default)
-        return default if item is None or pd.isna(item) else item
+MESES_ES = ["", "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+            "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+GRUPO_POR_UNIDAD = {"Obras": "B", "Inversiones": "D", "Planificación": "F", "Convenio": "F"}
 
-    projects, works = [], []
+
+def _isnull(value) -> bool:
+    try:
+        return value is None or pd.isna(value)
+    except (TypeError, ValueError):
+        return False
+
+
+def _cell(row, key, default=""):
+    value = row.get(key, default)
+    return default if _isnull(value) else value
+
+
+def _iso(value) -> str:
+    if _isnull(value):
+        return ""
+    parsed = pd.to_datetime(value, errors="coerce")
+    return "" if pd.isna(parsed) else parsed.date().isoformat()
+
+
+def html_payload(frame: pd.DataFrame) -> dict:
+    projects, works, convenio = [], [], []
     for _, row in frame.iterrows():
-        owner = str(value(row, "owner_unit"))
-        project = {
-            "grupo": "B" if owner.lower() == "obras" else "D" if owner.lower() == "inversiones" else "F",
-            "prov": str(value(row, "province")), "comuna": str(value(row, "commune")),
-            "tipo": str(value(row, "facility_type")), "nombre": str(value(row, "name")),
-            "m2": "", "cat": str(value(row, "category")), "bip": str(value(row, "bip")),
-            "etapa": str(value(row, "stage")), "rate": "", "estado": str(value(row, "status")),
-            "fin": str(value(row, "funding")), "coment": str(value(row, "comments")),
-            "enc": owner or str(value(row, "responsible")),
-        }
-        projects.append(project)
-        if owner.lower() == "obras":
-            end = pd.to_datetime(row.get("contract_end"), errors="coerce")
-            days = "" if pd.isna(end) else str((end.date() - date.today()).days)
-            works.append({
-                "est": str(value(row, "facility_type")), "proy": str(value(row, "name")),
-                "resp": str(value(row, "responsible")), "term": "" if pd.isna(end) else end.date().isoformat(),
-                "dias": days, "estado": str(value(row, "status")),
-                "gfc": str(value(row, "guarantee_end")), "grc": "",
-                "sigetapa": str(value(row, "next_steps")),
+        unit = str(_cell(row, "owner_unit"))
+        grupo = str(_cell(row, "grupo")).strip().upper() or GRUPO_POR_UNIDAD.get(unit, "G")
+        commitment = str(_cell(row, "commitment")).strip()
+        if unit != "Convenio":
+            projects.append({
+                "grupo": grupo, "prov": str(_cell(row, "province")), "comuna": str(_cell(row, "commune")),
+                "tipo": str(_cell(row, "facility_type")), "nombre": str(_cell(row, "name")),
+                "m2": str(_cell(row, "m2")), "cat": str(_cell(row, "category")), "bip": str(_cell(row, "bip")),
+                "etapa": str(_cell(row, "stage")), "rate": str(_cell(row, "rate")), "estado": str(_cell(row, "status")),
+                "fin": str(_cell(row, "funding")), "coment": str(_cell(row, "comments")),
+                "enc": str(_cell(row, "responsible")) or unit,
             })
+        if unit == "Obras":
+            term = _iso(_cell(row, "contract_end", None))
+            days = "" if not term else str((pd.to_datetime(term).date() - date.today()).days)
+            works.append({
+                "est": str(_cell(row, "facility_type")), "proy": str(_cell(row, "name")),
+                "resp": str(_cell(row, "responsible")), "term": term, "dias": days,
+                "estado": str(_cell(row, "status")),
+                "gfc": _iso(_cell(row, "guarantee_end", None)) or "N/A",
+                "grc": _iso(_cell(row, "guarantee_civil_end", None)) or "N/A",
+                "sigetapa": str(_cell(row, "next_steps")),
+            })
+        if commitment:
+            convenio.append({
+                "item": str(len(convenio) + 1), "proy": str(_cell(row, "name")),
+                "bip": str(_cell(row, "bip")), "compromiso": commitment,
+            })
+    now = datetime.now()
     return {
-        "projects": projects, "obras": works, "convenio": [],
+        "projects": projects, "obras": works, "convenio": convenio,
         "grupo_lbl": {"A": "Pre-Hospitalarios", "B": "Atención Primaria", "C": "Hospitalarios", "D": "Equipos y Equipamiento", "E": "COSAM", "F": "Otras Iniciativas", "G": "Otros Proyectos"},
-        "gen": datetime.now().strftime("%d de %B de %Y"),
+        "gen": f"{now.day} de {MESES_ES[now.month]} de {now.year}",
     }
 
 
@@ -131,13 +159,13 @@ requested_view = str(st.query_params.get("view", "panel")).lower()
 views = {
     "panel": "Panel visual HTML", "resumen": "Resumen ejecutivo",
     "cartera": "Cartera de proyectos", "actualizar": "Actualizar proyecto",
-    "administracion": "Administración",
+    "nuevo": "Nuevo proyecto", "administracion": "Administración",
 }
 allowed_by_role = {
     "Administrador": set(views),
-    "Obras": {"panel", "cartera", "actualizar"},
-    "Inversiones": {"panel", "cartera", "actualizar"},
-    "Planificación": {"panel", "cartera", "actualizar"},
+    "Obras": {"panel", "cartera", "actualizar", "nuevo"},
+    "Inversiones": {"panel", "cartera", "actualizar", "nuevo"},
+    "Planificación": {"panel", "cartera", "actualizar", "nuevo"},
     "Dirección": {"panel", "resumen", "cartera"},
     "Consulta": {"panel", "cartera"},
 }
@@ -163,7 +191,7 @@ elif section == "Resumen ejecutivo":
     with left:
         if not data.empty:
             counts = data["status"].fillna("Sin estado").value_counts().head(10).rename_axis("Estado").reset_index(name="Proyectos")
-            st.plotly_chart(px.bar(counts, x="Proyectos", y="Estado", orientation="h", color="Proyectos", color_continuous_scale="Teal"), use_container_width=True)
+            st.plotly_chart(px.bar(counts, x="Proyectos", y="Estado", orientation="h", color="Proyectos", color_continuous_scale="Blues"), use_container_width=True)
     with right:
         if not data.empty:
             units = data["owner_unit"].fillna("Sin unidad").value_counts().rename_axis("Unidad").reset_index(name="Proyectos")
@@ -211,17 +239,76 @@ elif section == "Actualizar proyecto":
                 st.success("Proyecto actualizado y registrado en el historial.")
                 st.cache_data.clear()
 
+elif section == "Nuevo proyecto":
+    st.subheader("Nuevo proyecto (carga manual)")
+    st.caption("Registre un proyecto individual. Si el código BIP y el nombre coinciden con uno existente, se actualizará.")
+    unidades = ["Inversiones", "Obras", "Planificación"]
+    grupos = ["", "A", "B", "C", "D", "E", "F", "G"]
+    default_unit = user.get("unit") if user.get("unit") in unidades else "Inversiones"
+    with st.form("new_project", clear_on_submit=True):
+        col1, col2, col3 = st.columns(3)
+        name = col1.text_input("Nombre del proyecto *")
+        bip = col2.text_input("Código BIP", "S/C")
+        owner_unit = col3.selectbox("Unidad responsable", unidades, index=unidades.index(default_unit))
+        col4, col5, col6 = st.columns(3)
+        grupo = col4.selectbox("Grupo (A–G)", grupos)
+        province = col5.text_input("Provincia")
+        commune = col6.text_input("Comuna")
+        col7, col8, col9 = st.columns(3)
+        facility_type = col7.text_input("Tipo de establecimiento")
+        category = col8.text_input("Categoría")
+        rate = col9.text_input("RATE")
+        col10, col11, col12 = st.columns(3)
+        stage = col10.text_input("Etapa actual")
+        status = col11.text_input("Estado")
+        funding = col12.text_input("Financiamiento")
+        progress = st.slider("Avance (%)", 0, 100, 0) / 100
+        responsible = st.text_input("Encargado / responsable")
+        cold1, cold2, cold3 = st.columns(3)
+        contract_end = cold1.date_input("Término de contrato", value=None, format="DD-MM-YYYY")
+        guarantee_end = cold2.date_input("Vigencia fiel cumplimiento", value=None, format="DD-MM-YYYY")
+        guarantee_civil_end = cold3.date_input("Vigencia responsabilidad civil", value=None, format="DD-MM-YYYY")
+        commitment = st.text_area("Compromiso Convenio de Programación (opcional)")
+        comments = st.text_area("Comentario ejecutivo")
+        submitted = st.form_submit_button("Guardar proyecto", type="primary")
+        if submitted:
+            if not name.strip():
+                st.error("El nombre del proyecto es obligatorio.")
+            else:
+                record = {c: None for c in PROJECT_COLUMNS}
+                record.update({
+                    "id": make_id(bip, name), "grupo": grupo, "bip": bip.strip(), "name": name.strip(),
+                    "province": province.strip(), "commune": commune.strip(), "facility_type": facility_type.strip(),
+                    "category": category.strip(), "rate": rate.strip(), "stage": stage.strip(),
+                    "status": status.strip(), "funding": funding.strip(), "progress": progress,
+                    "owner_unit": owner_unit, "responsible": responsible.strip(),
+                    "contract_end": contract_end, "guarantee_end": guarantee_end,
+                    "guarantee_civil_end": guarantee_civil_end, "commitment": commitment.strip(),
+                    "comments": comments.strip(),
+                })
+                upsert_projects(pd.DataFrame([record]), email)
+                st.success(f"Proyecto «{name.strip()}» guardado y registrado en el historial.")
+                st.cache_data.clear()
+
 elif section == "Administración":
     st.subheader("Administración del sistema")
     st.caption(f"Fuente de datos activa: {backend_name()}")
     load_tab, users_tab = st.tabs(["Carga de proyectos", "Usuarios y perfiles"])
     with load_tab:
+        st.caption("Acepta la Matriz completa (multihoja), la Planilla de Inversiones o la Planilla de Obras. El sistema reconoce automáticamente cada hoja.")
         uploaded = st.file_uploader("Cargar Matriz, Planilla de Obras o Planilla de Inversiones", type=["xlsx"])
         if uploaded:
             try:
                 preview = parse_workbook(uploaded.getvalue())
-                st.success(f"Se reconocieron {len(preview)} proyectos.")
-                st.dataframe(preview[["bip", "name", "stage", "status", "owner_unit"]].head(30), hide_index=True, use_container_width=True)
+                obras_n = int((preview["owner_unit"] == "Obras").sum())
+                conv_n = int((preview["commitment"].fillna("").astype(str).str.len() > 0).sum())
+                cartera_n = int((preview["owner_unit"] != "Convenio").sum())
+                st.success(f"Se reconocieron {len(preview)} registros.")
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Cartera de inversión", cartera_n)
+                m2.metric("Obras y contratos", obras_n)
+                m3.metric("Compromisos convenio", conv_n)
+                st.dataframe(preview[["grupo", "bip", "name", "stage", "status", "owner_unit"]].head(40), hide_index=True, use_container_width=True)
                 replace_demo = st.checkbox("Eliminar registros de demostración después de cargar")
                 if st.button("Confirmar carga", type="primary"):
                     upsert_projects(preview, email)
