@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
 from datetime import date, datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import streamlit.components.v1 as components
 
 from services.database import get_user, init_db, read_projects, upsert_projects
 from services.importer import PROJECT_COLUMNS, parse_workbook
@@ -46,6 +49,47 @@ def days_status(value) -> str:
     return "Vigente"
 
 
+def html_payload(frame: pd.DataFrame) -> dict:
+    def value(row, key, default=""):
+        item = row.get(key, default)
+        return default if item is None or pd.isna(item) else item
+
+    projects, works = [], []
+    for _, row in frame.iterrows():
+        owner = str(value(row, "owner_unit"))
+        project = {
+            "grupo": "B" if owner.lower() == "obras" else "D" if owner.lower() == "inversiones" else "F",
+            "prov": str(value(row, "province")), "comuna": str(value(row, "commune")),
+            "tipo": str(value(row, "facility_type")), "nombre": str(value(row, "name")),
+            "m2": "", "cat": str(value(row, "category")), "bip": str(value(row, "bip")),
+            "etapa": str(value(row, "stage")), "rate": "", "estado": str(value(row, "status")),
+            "fin": str(value(row, "funding")), "coment": str(value(row, "comments")),
+            "enc": owner or str(value(row, "responsible")),
+        }
+        projects.append(project)
+        if owner.lower() == "obras":
+            end = pd.to_datetime(row.get("contract_end"), errors="coerce")
+            days = "" if pd.isna(end) else str((end.date() - date.today()).days)
+            works.append({
+                "est": str(value(row, "facility_type")), "proy": str(value(row, "name")),
+                "resp": str(value(row, "responsible")), "term": "" if pd.isna(end) else end.date().isoformat(),
+                "dias": days, "estado": str(value(row, "status")),
+                "gfc": str(value(row, "guarantee_end")), "grc": "",
+                "sigetapa": str(value(row, "next_steps")),
+            })
+    return {
+        "projects": projects, "obras": works, "convenio": [],
+        "grupo_lbl": {"A": "Pre-Hospitalarios", "B": "Atención Primaria", "C": "Hospitalarios", "D": "Equipos y Equipamiento", "E": "COSAM", "F": "Otras Iniciativas", "G": "Otros Proyectos"},
+        "gen": datetime.now().strftime("%d de %B de %Y"),
+    }
+
+
+def render_html_dashboard(frame: pd.DataFrame) -> None:
+    template = (Path(__file__).parent / "assets" / "panel_template.html").read_text(encoding="utf-8")
+    rendered = template.replace("__DASHBOARD_DATA__", json.dumps(html_payload(frame), ensure_ascii=False, default=str))
+    components.html(rendered, height=1450, scrolling=True)
+
+
 init_db()
 email, display_name = identity()
 user = get_user(email, secret("ADMIN_EMAIL", "admin@demo.local"))
@@ -62,13 +106,16 @@ with st.sidebar:
     st.caption(email)
     if user["role"] != "Administrador" and user.get("unit"):
         st.caption(f'Unidad: {user["unit"]}')
-    section = st.radio("Navegación", ["Resumen ejecutivo", "Cartera de proyectos", "Actualizar proyecto", "Administración"] if user["role"] == "Administrador" else ["Resumen ejecutivo", "Cartera de proyectos", "Actualizar proyecto"] if user["role"] not in {"Dirección", "Consulta"} else ["Resumen ejecutivo", "Cartera de proyectos"])
+    section = st.radio("Navegación", ["Panel visual HTML", "Resumen ejecutivo", "Cartera de proyectos", "Actualizar proyecto", "Administración"] if user["role"] == "Administrador" else ["Panel visual HTML", "Resumen ejecutivo", "Cartera de proyectos", "Actualizar proyecto"] if user["role"] not in {"Dirección", "Consulta"} else ["Panel visual HTML", "Resumen ejecutivo", "Cartera de proyectos"])
 
 data = read_projects()
 if user["role"] not in {"Administrador", "Dirección", "Consulta"} and user.get("unit"):
     data = data[data["owner_unit"].fillna("").str.lower() == user["unit"].lower()]
 
-if section == "Resumen ejecutivo":
+if section == "Panel visual HTML":
+    render_html_dashboard(data)
+
+elif section == "Resumen ejecutivo":
     st.subheader("Resumen ejecutivo")
     contracts = data["contract_end"].apply(days_status) if not data.empty else pd.Series(dtype=str)
     c1, c2, c3, c4 = st.columns(4)
@@ -151,4 +198,3 @@ elif section == "Administración":
             st.error(f"No se pudo procesar la planilla: {exc}")
 
 st.caption(f"Última visualización: {datetime.now(timezone.utc).strftime('%d-%m-%Y %H:%M UTC')} · Los permisos de edición se validan en el servidor.")
-
