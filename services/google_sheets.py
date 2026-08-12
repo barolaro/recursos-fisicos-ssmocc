@@ -96,10 +96,15 @@ def initialize() -> bool:
 
 
 def read_projects() -> pd.DataFrame:
-    records = _worksheet(PROJECT_SHEET, PROJECT_HEADERS).get_all_records(
-        expected_headers=PROJECT_HEADERS, numericise_ignore=[1]
-    )
-    frame = pd.DataFrame(records, columns=PROJECT_HEADERS)
+    # Lee usando los encabezados reales de la hoja. Esto permite conservar bases
+    # creadas por versiones anteriores aunque las columnas estén en otro orden.
+    values = _worksheet(PROJECT_SHEET, PROJECT_HEADERS).get_all_values()
+    if not values:
+        return pd.DataFrame(columns=PROJECT_HEADERS)
+    headers = [str(value).strip() for value in values[0]]
+    rows = [row + [""] * (len(headers) - len(row)) for row in values[1:]]
+    records = [dict(zip(headers, row[:len(headers)])) for row in rows]
+    frame = pd.DataFrame(records).reindex(columns=PROJECT_HEADERS)
     if frame.empty:
         return frame
     frame["progress"] = pd.to_numeric(frame["progress"], errors="coerce")
