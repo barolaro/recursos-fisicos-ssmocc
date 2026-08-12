@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-# Despliegue sincronizado: app e importador deben cargarse desde el mismo commit.
-
 import json
 from datetime import date, datetime, timezone
+from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
@@ -122,6 +121,47 @@ def render_html_dashboard(frame: pd.DataFrame) -> bool:
     return True
 
 
+def model_workbook(kind: str) -> bytes:
+    """Genera plantillas compatibles con el importador, listas para descargar."""
+    cartera_columns = [
+        "GRUPO", "PROVINCIA", "COMUNA", "TIPO DE ESTABLECIMIENTO",
+        "NOMBRE DEL PROYECTO", "CÓD. BIP", "CATEGORÍA", "M2", "RATE",
+        "ETAPA ACTUAL", "ESTADO", "FINANCIAMIENTO", "% AVANCE", "ENCARGADO",
+        "COMPROMISO OCTUBRE 2026", "COMENTARIOS",
+    ]
+    obras_columns = [
+        "ESTABLECIMIENTO", "PROYECTO", "TIPO", "RESPONSABLE", "FECHA INICIO",
+        "FECHA TERMINO", "ESTADO", "VIGENCIA FIEL CUMPLIMIENTO",
+        "VIGENCIA RESPONSABILIDAD CIVIL", "TAREAS EN DESARROLLO",
+        "SIGUIENTES ETAPAS PROYECTO",
+    ]
+    convenio_columns = ["ITEM", "PROYECTO", "CÓDIGO BIP", "COMPROMISO A OCTUBRE 2026"]
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        if kind in {"matriz", "inversiones"}:
+            pd.DataFrame(columns=cartera_columns).to_excel(
+                writer, sheet_name="PROY. INVERSIÓN 2026" if kind == "matriz" else "INVERSIONES",
+                index=False,
+            )
+        if kind == "matriz":
+            pd.DataFrame(columns=cartera_columns).to_excel(writer, sheet_name="PLANIFICACIÓN", index=False)
+            pd.DataFrame(columns=obras_columns).to_excel(writer, sheet_name="OBRAS Y CONTRATOS", index=False)
+            pd.DataFrame(columns=convenio_columns).to_excel(writer, sheet_name="CONVENIO", index=False)
+        elif kind == "obras":
+            pd.DataFrame(columns=obras_columns).to_excel(writer, sheet_name="PROYECTOS", index=False)
+        for sheet in writer.book.worksheets:
+            sheet.freeze_panes = "A2"
+            sheet.auto_filter.ref = sheet.dimensions
+            for cell in sheet[1]:
+                cell.font = cell.font.copy(bold=True, color="FFFFFF")
+                cell.fill = cell.fill.copy(fill_type="solid", fgColor="0C4C97")
+            for column in sheet.columns:
+                sheet.column_dimensions[column[0].column_letter].width = min(
+                    42, max(14, len(str(column[0].value or "")) + 3)
+                )
+    return output.getvalue()
+
+
 init_db()
 if "auth_user" not in st.session_state:
     st.markdown('<div class="hero"><h1>Acceso protegido</h1><p>Panel de Recursos Físicos · SSMOC</p></div>', unsafe_allow_html=True)
@@ -145,6 +185,13 @@ st.markdown('<div class="hero"><h1>Panel de Recursos Físicos</h1><p>Seguimiento
 if st.button("Cerrar sesión"):
     del st.session_state.auth_user
     st.rerun()
+
+if user["role"] == "Administrador":
+    st.caption("Acciones de administración")
+    action_a, action_b, action_c = st.columns(3)
+    action_a.link_button("📤 Cargar planilla", "?view=administracion", use_container_width=True)
+    action_b.link_button("✍️ Ingreso manual", "?view=nuevo", use_container_width=True)
+    action_c.link_button("📊 Volver al panel", "?view=panel", use_container_width=True)
 
 with st.sidebar:
     st.markdown("### Sesión")
@@ -298,6 +345,28 @@ elif section == "Administración":
     load_tab, users_tab = st.tabs(["Carga de proyectos", "Usuarios y perfiles"])
     with load_tab:
         st.caption("Acepta la Matriz completa (multihoja), la Planilla de Inversiones o la Planilla de Obras. El sistema reconoce automáticamente cada hoja.")
+        st.markdown("#### Descargar formatos modelo")
+        d1, d2, d3 = st.columns(3)
+        d1.download_button(
+            "⬇️ Modelo Matriz completa", model_workbook("matriz"),
+            "Modelo_Matriz_Recursos_Fisicos.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
+        d2.download_button(
+            "⬇️ Modelo Inversiones", model_workbook("inversiones"),
+            "Modelo_Planilla_Inversiones.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
+        d3.download_button(
+            "⬇️ Modelo Obras", model_workbook("obras"),
+            "Modelo_Planilla_Obras.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
+        st.info("Complete una fila por proyecto o contrato, conserve los nombres de las columnas y luego cargue el archivo aquí.")
+        st.link_button("✍️ Ingresar un proyecto manualmente", "?view=nuevo")
         uploaded = st.file_uploader("Cargar Matriz, Planilla de Obras o Planilla de Inversiones", type=["xlsx"])
         if uploaded:
             try:
