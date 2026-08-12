@@ -194,6 +194,8 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
     <select class="role" id="role" title="Vista según perfil"><option>Administrador</option><option>Obras</option><option>Inversiones</option><option>Dirección</option></select>
     <span class="gen" id="datestamp">Datos al 11 de agosto de 2026</span>
     <button class="btn teal" id="upload">Cargar planilla</button>
+    <button class="btn ghost" id="manual">Ingreso manual</button>
+    <button class="btn ghost" id="users">Usuarios</button>
     <button class="btn ghost" id="reports">Generar informe</button>
     <button class="btn" id="export">Exportar CSV</button>
     <button class="btn ghost" id="logout">Cerrar sesión</button>
@@ -477,14 +479,18 @@ function init(){
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tab(t.dataset.t);if(t.dataset.t==='obras')renderObras();if(t.dataset.t==='conv')renderConv();});
   $('#scrim').onclick=closeDrawer;$('#dclose').onclick=closeDrawer;
   $('#export').onclick=exportCSV;
-  $('#logout').onclick=()=>{window.top.location.href='?logout=1'};
-  $('#upload').onclick=()=>{window.top.location.href='?view=administracion'};
+  const APP='__APP_BASE_URL__';
+  const openApp=view=>window.open(APP+'?view='+view,'_blank','noopener');
+  $('#logout').onclick=()=>window.open(APP+'?logout=1','_blank','noopener');
+  $('#upload').onclick=()=>openApp('administracion');
+  $('#manual').onclick=()=>openApp('nuevo');
+  $('#users').onclick=()=>openApp('administracion&tab=usuarios');
   $('#reports').onclick=e=>{e.stopPropagation();$('#reportmenu').classList.toggle('open')};
   $('#reportmenu').querySelectorAll('button').forEach(b=>b.onclick=()=>{report(b.dataset.report);$('#reportmenu').classList.remove('open')});document.addEventListener('click',()=>$('#reportmenu').classList.remove('open'));
   $('#role').onchange=e=>{const v=e.target.value;if(v==='Obras')tab('obras');else if(v==='Inversiones')tab('cartera');else if(v==='Dirección')tab('conv');notify('Vista ajustada al perfil '+v+'.')};
   $('#theme').onclick=()=>{document.body.classList.toggle('dark');localStorage.setItem('ssmoc_theme',document.body.classList.contains('dark')?'dark':'light')};if(localStorage.getItem('ssmoc_theme')==='dark')document.body.classList.add('dark');
   $('#cmd').onclick=openCommand;$('#command').onclick=e=>{if(e.target===$('#command'))closeCommand()};$('#commandinput').oninput=e=>commandSearch(e.target.value);document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCommand()}if(e.key==='Escape')closeCommand()});
-  $('#heroUpload').onclick=()=>{window.top.location.href='?view=administracion'};$('#heroReport').onclick=()=>report('gerencial');
+  $('#heroUpload').onclick=()=>openApp('administracion');$('#heroReport').onclick=()=>report('gerencial');
   document.querySelectorAll('.decision').forEach(d=>d.onclick=()=>{tab('cartera');F.q=d.dataset.query;$('#f_q').value=F.q;render();document.querySelector('.tablewrap').scrollIntoView({behavior:'smooth',block:'start'})});
   $('#filttoggle').onclick=()=>$('#side').classList.toggle('open');
   $('#cvsearch').oninput=e=>renderConv(e.target.value);
