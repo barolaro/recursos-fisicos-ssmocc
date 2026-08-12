@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+import time
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import gspread
 import bcrypt
@@ -44,12 +45,25 @@ def workbook():
     return gspread.authorize(credentials).open_by_key(st.secrets["GOOGLE_SHEET_ID"])
 
 
-def _worksheet(title: str, headers: list[str]):
+@st.cache_resource
+def _sheet(title: str, column_count: int):
     book = workbook()
-    try:
-        sheet = book.worksheet(title)
-    except gspread.WorksheetNotFound:
-        sheet = book.add_worksheet(title=title, rows=1000, cols=max(10, len(headers)))
+    for attempt in range(3):
+        try:
+            return book.worksheet(title)
+        except gspread.WorksheetNotFound:
+            return book.add_worksheet(title=title, rows=1000, cols=max(10, column_count))
+        except gspread.exceptions.APIError as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", 0)
+            if status not in {429, 500, 502, 503, 504} or attempt == 2:
+                raise
+            time.sleep(1 + attempt)
+
+
+def _worksheet(title: str, headers: list[str], ensure_headers: bool = False):
+    sheet = _sheet(title, len(headers))
+    if not ensure_headers:
+        return sheet
     first = sheet.row_values(1)
     if not first:
         sheet.update(values=[headers], range_name="A1")
@@ -71,11 +85,13 @@ def _worksheet(title: str, headers: list[str]):
     return sheet
 
 
-def initialize() -> None:
-    _worksheet(PROJECT_SHEET, PROJECT_HEADERS)
-    _worksheet(USER_SHEET, USER_HEADERS)
-    _worksheet(AUDIT_SHEET, AUDIT_HEADERS)
-    _worksheet(CATALOG_SHEET, CATALOG_HEADERS)
+@st.cache_resource
+def initialize() -> bool:
+    _worksheet(PROJECT_SHEET, PROJECT_HEADERS, ensure_headers=True)
+    _worksheet(USER_SHEET, USER_HEADERS, ensure_headers=True)
+    _worksheet(AUDIT_SHEET, AUDIT_HEADERS, ensure_headers=True)
+    _worksheet(CATALOG_SHEET, CATALOG_HEADERS, ensure_headers=True)
+    return True
 
 
 def read_projects() -> pd.DataFrame:
@@ -94,7 +110,7 @@ def read_projects() -> pd.DataFrame:
 def _clean(value):
     if value is None or pd.isna(value):
         return ""
-    if isinstance(value, (pd.Timestamp, datetime)):
+    if isinstance(value, (pd.Timestamp, datetime, date)):
         return value.isoformat()
     return value
 
