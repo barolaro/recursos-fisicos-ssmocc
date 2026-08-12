@@ -182,6 +182,49 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
 .dark .box h3,.dark .side .cnt,.dark .dhead h3,.dark .tabletop h3{color:#E9F0F7}
 .dark .kpi .n{color:#DBE7F5}.dark .kpi.accent .n{color:#F4595C}
 .dark .tab.act{background:var(--azul-bright)}
+
+/* ============ Capa de autogestión (CRUD in-panel) ============ */
+.rf-acth{width:96px}
+.rf-acts{white-space:nowrap}
+.rf-act{border:1px solid var(--line);background:var(--card);color:var(--steel);width:30px;height:28px;border-radius:7px;font-size:.9rem;line-height:1;margin-right:4px;transition:.15s}
+.rf-act:hover{border-color:var(--azul-bright);color:var(--azul);background:var(--azul-sky)}
+.rf-act.del:hover{border-color:var(--red);color:var(--red);background:#fdecec}
+.rf-new{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;background:var(--azul);color:#fff;border:0;padding:8px 13px;border-radius:8px;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.rf-new:hover{background:var(--navy);transform:translateY(-1px);box-shadow:0 6px 16px rgba(12,46,94,.2)}
+.rf-new b{font-size:1rem;line-height:1}
+.rf-modal{position:fixed;inset:0;z-index:200;display:none;align-items:flex-start;justify-content:center;padding:5vh 18px;background:rgba(8,35,73,.55);backdrop-filter:blur(6px)}
+.rf-modal.open{display:flex}
+.rf-box{width:min(860px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:16px;box-shadow:0 34px 90px rgba(8,35,73,.4)}
+.rf-mhead{position:sticky;top:0;z-index:2;background:linear-gradient(120deg,var(--azul-deep),var(--navy));color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.rf-mhead h3{font-family:var(--disp);font-weight:700;font-size:1.05rem;margin:0}
+.rf-mhead .sub{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#9FCBF2;margin-top:3px}
+.rf-x{background:rgba(255,255,255,.14);border:0;color:#fff;width:34px;height:34px;border-radius:9px;font-size:1.1rem}
+.rf-x:hover{background:rgba(255,255,255,.28)}
+.rf-form{padding:20px 22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.rf-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.rf-field.full{grid-column:1/-1}
+.rf-field label{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
+.rf-field label .req{color:var(--red)}
+.rf-field input,.rf-field select,.rf-field textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:.86rem}
+.rf-field textarea{min-height:80px;resize:vertical}
+.rf-field input:focus,.rf-field select:focus,.rf-field textarea:focus{outline:2px solid var(--azul-bright);outline-offset:-1px;background:#fff}
+.rf-mfoot{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rf-mfoot .right{display:flex;gap:10px}
+.rf-btn{border:0;border-radius:9px;padding:10px 18px;font-family:var(--body);font-weight:700;font-size:.85rem}
+.rf-btn.primary{background:var(--azul);color:#fff}.rf-btn.primary:hover{background:var(--navy)}
+.rf-btn.ghost{background:var(--soft);color:var(--navy)}.rf-btn.ghost:hover{background:#e2e9f2}
+.rf-btn.danger{background:#fdecec;color:var(--red)}.rf-btn.danger:hover{background:var(--red);color:#fff}
+.rf-drawer-actions{display:flex;gap:8px;margin-right:6px}
+.rf-drawer-actions button{background:rgba(255,255,255,.14);border:0;color:#fff;padding:7px 12px;border-radius:8px;font:600 .72rem var(--mono);letter-spacing:.05em}
+.rf-drawer-actions button:hover{background:rgba(255,255,255,.3)}
+.rf-drawer-actions button.del:hover{background:var(--red)}
+.rf-badge-edit{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);border:1px solid var(--teal);border-radius:99px;padding:3px 9px}
+.rf-badge-edit:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.dark .rf-box,.dark .rf-mfoot{background:#0f2032}
+.dark .rf-field input,.dark .rf-field select,.dark .rf-field textarea{background:#142a3e;color:#e9f0f7;border-color:#30465a}
+.dark .rf-act{background:#142a3e;color:#9FCBF2;border-color:#30465a}
+.dark .rf-btn.ghost{background:#182f44;color:#cfe0f2}
+@media(max-width:760px){.rf-form{grid-template-columns:1fr}}
 </style></head><body>
 
 <div class="topbar">
@@ -191,7 +234,7 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
     <button class="btn ghost filttoggle" id="filttoggle">Filtros</button>
     <button class="btn ghost themebtn" id="cmd" title="Búsqueda rápida">⌘</button>
     <button class="btn ghost themebtn" id="theme" title="Modo claro u oscuro">◐</button>
-    <select class="role" id="role" title="Vista según perfil"><option>Administrador</option><option>Obras</option><option>Inversiones</option><option>Dirección</option></select>
+    <select class="role" id="role" title="Perfil de la sesión" disabled><option>Administrador</option><option>Obras</option><option>Inversiones</option><option>Planificación</option><option>Dirección</option><option>Consulta</option></select>
     <span class="gen" id="datestamp">Datos al 11 de agosto de 2026</span>
     <button class="btn teal" id="upload">Cargar planilla</button>
     <button class="btn ghost" id="manual">Ingreso manual</button>
@@ -287,7 +330,10 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
 <div class="scrim" id="scrim"></div>
 <div class="drawer" id="drawer"><div class="dhead" id="dhead"><h3></h3><button class="x" id="dclose">×</button></div><div class="dbody" id="dbody"></div></div>
 
-<script>const D=__DASHBOARD_DATA__;</script>
+<div class="rf-modal" id="rfModal"><div class="rf-box"><div class="rf-mhead"><div><h3 id="rfTitle">Registro</h3><div class="sub" id="rfSub"></div></div><button class="rf-x" onclick="closeEditor()">✕</button></div><div class="rf-form" id="rfForm"></div><div class="rf-mfoot"><button class="rf-btn danger" id="rfDelete" style="display:none" onclick="rfDeleteCurrent()">🗑 Eliminar</button><div class="right"><button class="rf-btn ghost" onclick="closeEditor()">Cancelar</button><button class="rf-btn primary" onclick="saveEditor()">Guardar</button></div></div></div></div>
+<div class="rf-modal" id="rfConfirm"><div class="rf-box" style="width:min(470px,100%)"><div class="rf-mhead" style="background:linear-gradient(120deg,#a81c22,#da2a2e)"><div><h3>Confirmar eliminación</h3><div class="sub">Acción irreversible</div></div><button class="rf-x" onclick="rfConfirmCancel()">✕</button></div><div style="padding:22px;line-height:1.55" id="rfCText"></div><div class="rf-mfoot"><span></span><div class="right"><button class="rf-btn ghost" onclick="rfConfirmCancel()">Cancelar</button><button class="rf-btn danger" onclick="rfConfirmOk()">Sí, eliminar</button></div></div></div></div>
+
+<script>const D=__DASHBOARD_DATA__;const USER_ROLE=__USER_ROLE__;</script>
 <script>
 const F={grupo:'',prov:'',comuna:'',tipo:'',etapa:'',estado:'',fin:'',rate:'',q:''};
 const convBips=new Set(D.convenio.map(c=>(c.bip||'').replace(/-0$/,'').trim()).filter(Boolean));
@@ -348,22 +394,24 @@ function hbars(sel,key,d,limit){
 }
 let sortKey='grupo',sortDir=1;
 function renderTable(d){
+  ensureUids(D.projects);
   const cols=[['grupo','Gr'],['nombre','Proyecto'],['comuna','Comuna'],['tipo','Tipo'],['etapa','Etapa'],['estado','Estado'],['fin','Financiam.'],['rate','RATE']];
   const s=[...d].sort((a,b)=>{const x=(a[sortKey]||''),y=(b[sortKey]||'');return x.localeCompare(y,'es')*sortDir;});
   $('#tcount').textContent=d.length+' proyecto'+(d.length!==1?'s':'');
-  let html='<thead><tr>'+cols.map(c=>`<th data-s="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir>0?' ▲':' ▼'):''}</th>`).join('')+'</tr></thead><tbody>';
-  if(!s.length){html+='</tbody>';$('#ptable').innerHTML=html;}
+  let html='<thead><tr>'+cols.map(c=>`<th data-s="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir>0?' ▲':' ▼'):''}</th>`).join('')+(window._canEdit?'<th class="rf-acth">Acciones</th>':'')+'</tr></thead><tbody>';
   s.forEach((p,i)=>{
     const conv=convBips.has((p.bip||'').replace(/-0$/,'').trim());
-    html+=`<tr data-i="${i}"><td><span class="gtag">${p.grupo||''}</span></td>`+
+    html+=`<tr data-i="${i}" data-uid="${p._uid}"><td><span class="gtag">${p.grupo||''}</span></td>`+
       `<td>${esc(p.nombre)}${conv?' <span class="chip" title="En convenio de programación" style="color:var(--red);border-color:var(--red)">CONV</span>':''}</td>`+
       `<td>${esc(p.comuna)||'—'}</td><td>${esc(p.tipo)||'—'}</td><td>${esc(p.etapa)||'—'}</td>`+
-      `<td>${esc(p.estado)||'—'}</td><td>${esc(p.fin)||'—'}</td><td><span class="chip">${esc(p.rate)||'—'}</span></td></tr>`;
+      `<td>${esc(p.estado)||'—'}</td><td>${esc(p.fin)||'—'}</td><td><span class="chip">${esc(p.rate)||'—'}</span></td>`+
+      (window._canEdit?`<td class="rf-acts">${actBtns('proyecto',p._uid)}</td>`:'')+`</tr>`;
   });
   html+='</tbody>';
   $('#ptable').innerHTML=html;
-  $('#ptable').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.s;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}renderTable(d);});
-  $('#ptable').querySelectorAll('tbody tr').forEach(tr=>tr.onclick=()=>openDrawer(s[+tr.dataset.i]));
+  $('#ptable').querySelectorAll('th[data-s]').forEach(th=>th.onclick=()=>{const k=th.dataset.s;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}renderTable(d);});
+  $('#ptable').querySelectorAll('tbody tr').forEach(tr=>tr.onclick=e=>{if(e.target.closest('.rf-act'))return;openDrawer(s[+tr.dataset.i]);});
+  wireActs('#ptable');
   $('#emptyc').style.display=s.length?'none':'block';
   window._filtered=s;
 }
@@ -398,14 +446,16 @@ function renderObras(){
   const btns=[['','Todos'],['g','Vigentes'],['a','Por vencer'],['r','Vencidos']];
   $('#sembtns').innerHTML=btns.map(b=>`<button class="sembtn ${obraF===b[0]?'act':''}" data-s="${b[0]}">${b[0]?`<span class="dot ${b[0]}"></span>`:''}${b[1]}</button>`).join('');
   $('#sembtns').querySelectorAll('.sembtn').forEach(b=>b.onclick=()=>{obraF=b.dataset.s;renderObras();});
+  ensureUids(D.obras);
   const show=rows.filter(r=>!obraF||r.c[0]===obraF);
-  let h='<thead><tr><th>Establecimiento</th><th>Proyecto / Contrato</th><th>Responsable</th><th>Término</th><th>Días</th><th>Contrato</th><th>G. Fiel Cumpl.</th><th>G. Resp. Civil</th><th>Siguiente etapa</th></tr></thead><tbody>';
-  show.forEach(({o,c,gfc,grc})=>{h+=`<tr><td>${esc(o.est)||'—'}</td><td>${esc(o.proy)}</td><td>${esc((o.resp||'').replace(/\n/g,' / '))||'—'}</td><td>${esc(o.term)||'—'}</td><td>${esc(o.dias)||'—'}</td>`+
+  let h='<thead><tr><th>Establecimiento</th><th>Proyecto / Contrato</th><th>Responsable</th><th>Término</th><th>Días</th><th>Contrato</th><th>G. Fiel Cumpl.</th><th>G. Resp. Civil</th><th>Siguiente etapa</th>'+(window._canEdit?'<th class="rf-acth">Acciones</th>':'')+'</tr></thead><tbody>';
+  show.forEach(({o,c,gfc,grc})=>{h+=`<tr data-uid="${o._uid}"><td>${esc(o.est)||'—'}</td><td>${esc(o.proy)}</td><td>${esc((o.resp||'').replace(/\n/g,' / '))||'—'}</td><td>${esc(o.term)||'—'}</td><td>${esc(o.dias)||'—'}</td>`+
     `<td><span class="sem-txt ${c[0]}"><span class="dot ${c[0]}"></span>${c[1]}</span></td>`+
     `<td><span class="sem-txt ${gfc[0]}"><span class="dot ${gfc[0]}"></span>${esc(o.gfc)||'—'}</span></td>`+
     `<td><span class="sem-txt ${grc[0]}"><span class="dot ${grc[0]}"></span>${esc(o.grc)||'—'}</span></td>`+
-    `<td>${esc(o.sigetapa)||'—'}</td></tr>`;});
+    `<td>${esc(o.sigetapa)||'—'}</td>`+(window._canEdit?`<td class="rf-acts">${actBtns('obra',o._uid)}</td>`:'')+`</tr>`;});
   h+='</tbody>';$('#otable').innerHTML=h;
+  wireActs('#otable');
   $('#ocount').textContent=show.length+' contrato'+(show.length!==1?'s':'');
 }
 
@@ -415,9 +465,10 @@ function renderConv(q=''){
   const rows=D.convenio.filter(c=>!q||(c.proy||'').toLowerCase().includes(q)||(c.bip||'').toLowerCase().includes(q)||(c.compromiso||'').toLowerCase().includes(q));
   $('#ckpis').innerHTML=[['Compromisos',D.convenio.length,''],['Con Cód. BIP',D.convenio.filter(c=>c.bip).length,''],['Ciclo','Nov 25 – Oct 26','']]
     .map((k,i)=>`<div class="kpi ${i===2?'':''}" ${i===2?'style="grid-column:span 4"':''}><div class="n" ${i===2?'style="font-size:1.1rem"':''}>${k[1]}</div><div class="l">${k[0]}</div></div>`).join('');
-  let h='<thead><tr><th style="width:44px">#</th><th>Proyecto</th><th>Cód. BIP</th><th>Compromiso a Octubre 2026</th></tr></thead><tbody>';
-  rows.forEach(c=>{h+=`<tr><td><span class="chip">${esc(c.item)}</span></td><td>${esc(c.proy)}</td><td><span class="chip">${esc(c.bip)||'—'}</span></td><td style="max-width:420px">${esc(c.compromiso)||'—'}</td></tr>`;});
-  h+='</tbody>';$('#ctable').innerHTML=h;$('#ccount').textContent=rows.length+' compromiso'+(rows.length!==1?'s':'');
+  ensureUids(D.convenio);
+  let h='<thead><tr><th style="width:44px">#</th><th>Proyecto</th><th>Cód. BIP</th><th>Compromiso a Octubre 2026</th>'+(window._canEdit?'<th class="rf-acth">Acciones</th>':'')+'</tr></thead><tbody>';
+  rows.forEach(c=>{h+=`<tr data-uid="${c._uid}"><td><span class="chip">${esc(c.item)}</span></td><td>${esc(c.proy)}</td><td><span class="chip">${esc(c.bip)||'—'}</span></td><td style="max-width:420px">${esc(c.compromiso)||'—'}</td>`+(window._canEdit?`<td class="rf-acts">${actBtns('convenio',c._uid)}</td>`:'')+`</tr>`;});
+  h+='</tbody>';$('#ctable').innerHTML=h;wireActs('#ctable');$('#ccount').textContent=rows.length+' compromiso'+(rows.length!==1?'s':'');
 }
 
 /* ---- CSV export ---- */
@@ -498,5 +549,142 @@ function init(){
   render();
 }
 document.addEventListener('DOMContentLoaded',init);
+</script>
+<script>
+/* ============================================================
+   Capa de autogestión (CRUD in-panel) · Recursos Físicos SSMOC
+   Crea, edita y elimina Proyectos, Obras y Compromisos sin salir
+   del panel. Persiste en el navegador (localStorage).
+   ============================================================ */
+const RF_META={proyecto:{arr:'projects',title:'Proyecto',label:'la cartera',nameKey:'nombre'},
+               obra:{arr:'obras',title:'Obra / Contrato',label:'obras',nameKey:'proy'},
+               convenio:{arr:'convenio',title:'Compromiso de convenio',label:'el convenio',nameKey:'proy'}};
+const RF_FIELDS={
+  proyecto:[
+    {k:'nombre',l:'Nombre del proyecto',req:true,full:true},
+    {k:'grupo',l:'Grupo',type:'select',opts:['','A','B','C','D','E','F','G']},
+    {k:'bip',l:'Cód. BIP'},{k:'enc',l:'Encargado / unidad'},
+    {k:'prov',l:'Provincia'},{k:'comuna',l:'Comuna'},
+    {k:'tipo',l:'Tipo establecimiento'},{k:'cat',l:'Categoría'},
+    {k:'m2',l:'M²'},{k:'etapa',l:'Etapa actual'},{k:'rate',l:'RATE'},
+    {k:'estado',l:'Estado'},{k:'fin',l:'Financiamiento'},
+    {k:'coment',l:'Comentario ejecutivo',type:'textarea',full:true},
+  ],
+  obra:[
+    {k:'proy',l:'Proyecto / Contrato',req:true,full:true},
+    {k:'est',l:'Establecimiento'},{k:'resp',l:'Responsable'},
+    {k:'term',l:'Término de contrato',type:'date'},{k:'dias',l:'Días restantes',type:'number'},
+    {k:'estado',l:'Estado'},{k:'gfc',l:'Garantía fiel cumpl.',type:'date'},
+    {k:'grc',l:'Garantía resp. civil',type:'date'},
+    {k:'sigetapa',l:'Siguiente etapa',type:'textarea',full:true},
+  ],
+  convenio:[
+    {k:'proy',l:'Proyecto',req:true,full:true},
+    {k:'item',l:'Ítem N°'},{k:'bip',l:'Cód. BIP'},
+    {k:'compromiso',l:'Compromiso a Octubre 2026',type:'textarea',full:true},
+  ],
+};
+const RF_KEY='ssmoc_rf_data_v3';
+window._uidSeq=1;
+function ensureUids(arr){(arr||[]).forEach(x=>{if(x&&x._uid==null)x._uid='u'+(window._uidSeq++);});}
+function getArr(k){return D[RF_META[k].arr]||(D[RF_META[k].arr]=[]);}
+function findByUid(k,u){return getArr(k).find(x=>String(x._uid)===String(u));}
+function actBtns(kind,uid){return `<button class="rf-act edit" data-k="${kind}" data-u="${uid}" title="Editar">✎</button><button class="rf-act del" data-k="${kind}" data-u="${uid}" title="Eliminar">🗑</button>`;}
+function wireActs(sel){document.querySelectorAll(sel+' .rf-act').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.k,u=b.dataset.u;b.classList.contains('del')?rfAskDelete(k,u):openEditor(k,u);});}
+
+/* --- persistencia local --- */
+function persist(){try{localStorage.setItem(RF_KEY,JSON.stringify({projects:D.projects,obras:D.obras,convenio:D.convenio,ts:Date.now()}));}catch(e){}}
+function loadLocal(){try{const raw=localStorage.getItem(RF_KEY);if(!raw)return false;const o=JSON.parse(raw);if(o&&Array.isArray(o.projects)){D.projects=o.projects;D.obras=o.obras||[];D.convenio=o.convenio||[];return true;}}catch(e){}return false;}
+window._serverData=JSON.parse(JSON.stringify({projects:D.projects||[],obras:D.obras||[],convenio:D.convenio||[]}));
+loadLocal();
+ensureUids(D.projects);ensureUids(D.obras);ensureUids(D.convenio);
+function restoreServer(){rfConfirm('Se restaurarán los datos originales del servidor y se descartarán los cambios locales guardados en este navegador. Esta acción no se puede deshacer.',()=>{const s=window._serverData;D.projects=JSON.parse(JSON.stringify(s.projects));D.obras=JSON.parse(JSON.stringify(s.obras));D.convenio=JSON.parse(JSON.stringify(s.convenio));try{localStorage.removeItem(RF_KEY);}catch(e){}ensureUids(D.projects);ensureUids(D.obras);ensureUids(D.convenio);rfRerender();notify('Datos restaurados desde el servidor.');});}
+function rfBackup(){const blob=new Blob([JSON.stringify({projects:D.projects,obras:D.obras,convenio:D.convenio},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo_recursos_fisicos.json';a.click();notify('Respaldo descargado.');}
+
+/* --- permisos de edición según perfil --- */
+function computeCanEdit(){window._canEdit=['Administrador','Obras','Inversiones','Planificación'].includes(USER_ROLE);}
+computeCanEdit();
+
+/* --- editor (crear/editar) --- */
+let rfEditing={kind:null,uid:null};
+function openEditor(kind,uid){
+  rfEditing={kind,uid:uid||null};
+  const rec=uid?(findByUid(kind,uid)||{}):{};
+  const meta=RF_META[kind];
+  document.getElementById('rfTitle').textContent=(uid?'Editar ':'Nuevo ')+meta.title.toLowerCase();
+  document.getElementById('rfSub').textContent=uid?String(rec[meta.nameKey]||'').slice(0,64):'Complete los campos y guarde';
+  document.getElementById('rfForm').innerHTML=RF_FIELDS[kind].map(f=>{
+    const v=rec[f.k]==null?'':String(rec[f.k]);
+    const lab=`<label>${f.l}${f.req?' <span class="req">*</span>':''}</label>`;
+    let ctl;
+    if(f.type==='select')ctl=`<select data-k="${f.k}">${f.opts.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
+    else if(f.type==='textarea')ctl=`<textarea data-k="${f.k}">${esc(v)}</textarea>`;
+    else if(f.type==='date')ctl=`<input type="date" data-k="${f.k}" value="${/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''}">`;
+    else if(f.type==='number')ctl=`<input type="number" data-k="${f.k}" value="${esc(v)}">`;
+    else ctl=`<input type="text" data-k="${f.k}" value="${esc(v)}">`;
+    return `<div class="rf-field ${f.full?'full':''}">${lab}${ctl}</div>`;
+  }).join('');
+  document.getElementById('rfDelete').style.display=uid?'inline-flex':'none';
+  document.getElementById('rfModal').classList.add('open');
+}
+function closeEditor(){document.getElementById('rfModal').classList.remove('open');}
+function saveEditor(){
+  const kind=rfEditing.kind,meta=RF_META[kind],data={};
+  document.getElementById('rfForm').querySelectorAll('[data-k]').forEach(el=>data[el.dataset.k]=el.value.trim());
+  if(!data[meta.nameKey]){notify('El nombre del '+meta.title.toLowerCase()+' es obligatorio.');return;}
+  if(kind==='obra'){
+    if(data.term&&/^\d{4}-\d{2}-\d{2}$/.test(data.term)&&!data.dias)data.dias=String(Math.round((new Date(data.term)-TODAY)/86400000));
+    if(!data.gfc)data.gfc='N/A';if(!data.grc)data.grc='N/A';
+  }
+  if(rfEditing.uid){Object.assign(findByUid(kind,rfEditing.uid),data);notify('Registro actualizado correctamente.');}
+  else{
+    if(kind==='convenio'&&!data.item){const mx=Math.max(0,...getArr('convenio').map(c=>parseInt(c.item)||0));data.item=String(mx+1);}
+    data._uid='u'+(window._uidSeq++);getArr(kind).push(data);notify('Registro creado correctamente.');
+  }
+  persist();closeEditor();rfRerender();
+}
+function rfDeleteCurrent(){if(rfEditing.uid){const k=rfEditing.kind,u=rfEditing.uid;closeEditor();rfAskDelete(k,u);}}
+
+/* --- eliminación con confirmación --- */
+let rfPending=null;
+function rfAskDelete(kind,uid){const rec=findByUid(kind,uid);const nm=(rec&&(rec[RF_META[kind].nameKey]))||'este registro';rfConfirm('Se eliminará «'+nm+'» de '+RF_META[kind].label+'. Esta acción no se puede deshacer.',()=>{const arr=getArr(kind),i=arr.findIndex(x=>String(x._uid)===String(uid));if(i>=0)arr.splice(i,1);persist();rfRerender();notify('Registro eliminado.');});}
+function rfConfirm(msg,onOk){document.getElementById('rfCText').textContent=msg;rfPending=onOk;document.getElementById('rfConfirm').classList.add('open');}
+function rfConfirmOk(){document.getElementById('rfConfirm').classList.remove('open');if(rfPending){const f=rfPending;rfPending=null;f();}}
+function rfConfirmCancel(){document.getElementById('rfConfirm').classList.remove('open');rfPending=null;}
+
+/* --- re-render tras cambios (preserva filtros) --- */
+function rfRerender(){try{rebuildFilters();syncSelects();}catch(e){}render();try{renderObras();}catch(e){}try{renderConv((document.getElementById('cvsearch')||{}).value||'');}catch(e){}}
+
+/* --- botones "+ Nuevo" por pestaña --- */
+function injectNewButtons(){
+  [['#panel-cartera .tabletop','proyecto','Nuevo proyecto'],['#panel-obras .tabletop','obra','Nueva obra'],['#panel-conv .tabletop','convenio','Nuevo compromiso']].forEach(([sel,kind,label])=>{
+    const t=document.querySelector(sel);if(!t||t.querySelector('.rf-new'))return;
+    const h=t.querySelector('h3');const b=document.createElement('button');
+    b.className='rf-new';b.innerHTML='<b>+</b> '+label;b.onclick=()=>openEditor(kind,null);
+    if(h){const w=document.createElement('div');w.style.cssText='display:flex;align-items:center;gap:12px;min-width:0';h.parentNode.insertBefore(w,h);w.appendChild(h);w.appendChild(b);}else t.appendChild(b);
+  });
+}
+function updateNewButtons(){document.querySelectorAll('.rf-new').forEach(b=>b.style.display=window._canEdit?'inline-flex':'none');}
+function updateSessionActions(){
+  const admin=USER_ROLE==='Administrador';
+  const upload=document.getElementById('upload'),users=document.getElementById('users'),manual=document.getElementById('manual');
+  if(upload)upload.style.display=admin?'inline-flex':'none';
+  if(users)users.style.display=admin?'inline-flex':'none';
+  if(manual)manual.style.display=window._canEdit?'inline-flex':'none';
+}
+
+/* --- editar/eliminar desde el detalle (drawer) --- */
+const _rfOpenDrawer=window.openDrawer;
+window.openDrawer=function(p){_rfOpenDrawer(p);const dh=document.getElementById('dhead');if(!dh)return;const old=dh.querySelector('.rf-drawer-actions');if(old)old.remove();if(window._canEdit&&p&&p._uid!=null){const bar=document.createElement('div');bar.className='rf-drawer-actions';bar.innerHTML='<button class="edit">✎ Editar</button><button class="del">🗑 Eliminar</button>';bar.querySelector('.edit').onclick=()=>{closeDrawer();openEditor('proyecto',p._uid);};bar.querySelector('.del').onclick=()=>{closeDrawer();rfAskDelete('proyecto',p._uid);};dh.insertBefore(bar,dh.querySelector('.x'));}};
+
+/* --- init de la capa (tras el init original) --- */
+document.addEventListener('DOMContentLoaded',()=>{
+  const roleSel=document.getElementById('role');
+  if(roleSel){roleSel.value=USER_ROLE;roleSel.disabled=true;}
+  injectNewButtons();updateNewButtons();updateSessionActions();
+  const rm=document.getElementById('reportmenu');
+  if(rm&&!document.getElementById('rfBackup')){rm.insertAdjacentHTML('beforeend','<button id="rfBackup" type="button">Descargar respaldo (JSON)<small>Copia de seguridad de los datos actuales</small></button><button id="rfRestore" type="button">Restaurar datos del servidor<small>Descarta los cambios locales de este navegador</small></button>');document.getElementById('rfBackup').onclick=rfBackup;document.getElementById('rfRestore').onclick=restoreServer;}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeEditor();rfConfirmCancel();}});
+});
 </script>
 </body></html>
