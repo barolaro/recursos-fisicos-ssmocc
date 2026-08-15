@@ -45,4 +45,35 @@ Sin secretos configurados se inicia en modo demostración y crea una base SQLite
 5. El sistema crea las hojas `PROYECTOS`, `USUARIOS`, `HISTORIAL` y `CATALOGOS`.
 6. Ingresar inicialmente como `ADMIN_EMAIL` y registrar los demás correos y perfiles desde `?view=administracion`.
 
-La a
+La autorización se valida en Python. Los usuarios no requieren ni deben recibir acceso directo a la planilla, y sus contraseñas se almacenan exclusivamente como hashes bcrypt.
+
+No se deben subir planillas, bases de datos, credenciales ni documentos institucionales al repositorio.
+
+## Actualización integrada desde el dashboard
+
+El perfil Administrador dispone del botón **Actualizar cartera** en la barra del panel. Este abre una ventana modal sin abandonar el dashboard y permite seleccionar uno o varios archivos `.xlsx` en la misma operación.
+
+La ventana de carga:
+
+- reconoce automáticamente la Matriz completa, la Planilla de Inversiones y la Planilla de Obras;
+- valida cada archivo por separado;
+- descarta filas separadoras y normaliza los campos mediante el importador institucional;
+- consolida duplicados por identificador de proyecto;
+- compara cuántos registros son nuevos y cuántos serán actualizados;
+- muestra la distribución entre Inversiones, Obras, Planificación y Convenio;
+- exige revisión y confirmación explícita antes de escribir en la base central;
+- bloquea la actualización si alguno de los archivos presenta observaciones.
+
+La escritura se ejecuta en el servidor, conserva los controles de acceso y registra al usuario responsable en `HISTORIAL`. Las credenciales de Google Sheets nunca se envían al navegador.
+
+### Planillas reconocidas
+
+- `00 MATRIZ PROYECTOS 2026.xlsx`: hojas de Inversiones, Planificación y Convenio.
+- `Planilla Inversiones.xlsx`: cartera de iniciativas de inversión.
+- `Planilla Obras.xlsx`: contratos, vigencias, garantías y siguientes etapas.
+
+El Administrador puede cargar los tres archivos juntos. Antes de confirmar se presenta un resumen por archivo, vista previa de registros y recuento de nuevos, actualizados y duplicados.
+
+## Flujo de datos
+
+El Administrador carga la información desde el propio dashboard. Python valida y normaliza los libros, actualiza la base central y registra la operación en el historial. Los usuarios autorizados visualizan o actualizan solamente los proyectos correspondientes a su perfil y unidad.
