@@ -2,37 +2,11 @@
 
 Aplicación Streamlit para el seguimiento autogestionado de proyectos de Obras, Inversiones y Planificación del Servicio de Salud Metropolitano Occidente.
 
-## Carga de información
-
-El panel es **autogestionado**: se puede crear, editar y eliminar registros directamente en el panel visual (sin abrir otra ventana), además de la carga masiva y manual desde Streamlit.
-
-### Autogestión dentro del panel HTML
-
-Con perfil Administrador, Obras o Inversiones, cada pestaña (Cartera, Obras, Convenio) muestra:
-
-- Un botón **+ Nuevo** para crear un registro mediante un formulario en modal.
-- Una columna **Acciones** con editar (✎) y eliminar (🗑) por fila.
-- En Cartera, el detalle de cada proyecto incluye botones Editar/Eliminar.
-
-Las eliminaciones piden confirmación explícita y los cambios se guardan en el navegador (localStorage), por lo que persisten al recargar. Desde **Generar informe** se puede **Descargar respaldo (JSON)** o **Restaurar datos del servidor** (descarta los cambios locales). Los perfiles Dirección y Consulta ven el panel en solo lectura. Nota: la edición in-panel opera sobre una copia de trabajo del navegador; la escritura definitiva a la base (Google Sheets/SQL) se realiza desde la carga masiva o manual de Streamlit.
-
-### Carga masiva (Administración → Carga de proyectos)
-
-- `00_MATRIZ_PROYECTOS_2026.xlsx` — matriz completa: hoja de Inversión, Planificación (se omite si duplica a Inversión) y Convenio de Programación.
-- `Planilla_Inversiones.xlsx` — cartera de inversión con compromisos de octubre.
-- `Planilla_Obras.xlsx` — contratos, fechas de término, garantías (fiel cumplimiento y responsabilidad civil) y siguientes etapas.
-
-El importador detecta la fila de encabezados aunque haya banners o columnas en blanco, descarta filas separadoras de grupo, normaliza los códigos BIP y adjunta los compromisos del convenio por código BIP. Antes de confirmar se muestra un resumen por Cartera / Obras / Convenio.
-
-### Carga manual (Nuevo proyecto)
-
-Formulario en Streamlit para registrar un proyecto individual. Si el código BIP y el nombre coinciden con uno existente, se actualiza en lugar de duplicarse.
-
-Cada registro alimenta las tres pestañas del panel visual: Cartera de Inversión (grupos A–G, RATE, etapa, estado, financiamiento), Obras y Contratos (vigencias y garantías con semáforo) y Convenio de Programación (compromisos por BIP).
-
 ## Funcionalidades
 
 - Dashboard ejecutivo y acciones prioritarias.
+- Generación de informes institucionales en formato imprimible/PDF: informe gerencial integral, informe de inversiones e informe técnico de obras y contratos.
+- Informes con portada y logo SSMOC, resumen ejecutivo automático, KPI con denominadores, índice de control, semáforo de alertas, decisiones requeridas, plan de corto plazo, detalle trazable y ficha metodológica.
 - Panel HTML original integrado como vista principal y alimentado desde la base central.
 - Cartera filtrable y exportable.
 - Perfiles: Administrador, Obras, Inversiones, Planificación, Dirección y Consulta.
@@ -71,10 +45,4 @@ Sin secretos configurados se inicia en modo demostración y crea una base SQLite
 5. El sistema crea las hojas `PROYECTOS`, `USUARIOS`, `HISTORIAL` y `CATALOGOS`.
 6. Ingresar inicialmente como `ADMIN_EMAIL` y registrar los demás correos y perfiles desde `?view=administracion`.
 
-La autorización se valida en Python. Los usuarios no requieren ni deben recibir acceso directo a la planilla, y sus contraseñas se almacenan exclusivamente como hashes bcrypt.
-
-No se deben subir planillas, bases de datos, credenciales ni documentos institucionales al repositorio.
-
-## Flujo de datos
-
-El Administrador carga la matriz desde la aplicación. Los usuarios autorizados actualizan solamente los proyectos de su unidad; Dirección y Consulta mantienen acceso de lectura. Cada actualización queda registrada en `audit_log`.
+La a
