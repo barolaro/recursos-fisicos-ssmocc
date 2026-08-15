@@ -182,49 +182,6 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
 .dark .box h3,.dark .side .cnt,.dark .dhead h3,.dark .tabletop h3{color:#E9F0F7}
 .dark .kpi .n{color:#DBE7F5}.dark .kpi.accent .n{color:#F4595C}
 .dark .tab.act{background:var(--azul-bright)}
-
-/* ============ Capa de autogestión (CRUD in-panel) ============ */
-.rf-acth{width:96px}
-.rf-acts{white-space:nowrap}
-.rf-act{border:1px solid var(--line);background:var(--card);color:var(--steel);width:30px;height:28px;border-radius:7px;font-size:.9rem;line-height:1;margin-right:4px;transition:.15s}
-.rf-act:hover{border-color:var(--azul-bright);color:var(--azul);background:var(--azul-sky)}
-.rf-act.del:hover{border-color:var(--red);color:var(--red);background:#fdecec}
-.rf-new{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;background:var(--azul);color:#fff;border:0;padding:8px 13px;border-radius:8px;transition:.2s;display:inline-flex;align-items:center;gap:6px}
-.rf-new:hover{background:var(--navy);transform:translateY(-1px);box-shadow:0 6px 16px rgba(12,46,94,.2)}
-.rf-new b{font-size:1rem;line-height:1}
-.rf-modal{position:fixed;inset:0;z-index:200;display:none;align-items:flex-start;justify-content:center;padding:5vh 18px;background:rgba(8,35,73,.55);backdrop-filter:blur(6px)}
-.rf-modal.open{display:flex}
-.rf-box{width:min(860px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:16px;box-shadow:0 34px 90px rgba(8,35,73,.4)}
-.rf-mhead{position:sticky;top:0;z-index:2;background:linear-gradient(120deg,var(--azul-deep),var(--navy));color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.rf-mhead h3{font-family:var(--disp);font-weight:700;font-size:1.05rem;margin:0}
-.rf-mhead .sub{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#9FCBF2;margin-top:3px}
-.rf-x{background:rgba(255,255,255,.14);border:0;color:#fff;width:34px;height:34px;border-radius:9px;font-size:1.1rem}
-.rf-x:hover{background:rgba(255,255,255,.28)}
-.rf-form{padding:20px 22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.rf-field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.rf-field.full{grid-column:1/-1}
-.rf-field label{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
-.rf-field label .req{color:var(--red)}
-.rf-field input,.rf-field select,.rf-field textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:.86rem}
-.rf-field textarea{min-height:80px;resize:vertical}
-.rf-field input:focus,.rf-field select:focus,.rf-field textarea:focus{outline:2px solid var(--azul-bright);outline-offset:-1px;background:#fff}
-.rf-mfoot{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.rf-mfoot .right{display:flex;gap:10px}
-.rf-btn{border:0;border-radius:9px;padding:10px 18px;font-family:var(--body);font-weight:700;font-size:.85rem}
-.rf-btn.primary{background:var(--azul);color:#fff}.rf-btn.primary:hover{background:var(--navy)}
-.rf-btn.ghost{background:var(--soft);color:var(--navy)}.rf-btn.ghost:hover{background:#e2e9f2}
-.rf-btn.danger{background:#fdecec;color:var(--red)}.rf-btn.danger:hover{background:var(--red);color:#fff}
-.rf-drawer-actions{display:flex;gap:8px;margin-right:6px}
-.rf-drawer-actions button{background:rgba(255,255,255,.14);border:0;color:#fff;padding:7px 12px;border-radius:8px;font:600 .72rem var(--mono);letter-spacing:.05em}
-.rf-drawer-actions button:hover{background:rgba(255,255,255,.3)}
-.rf-drawer-actions button.del:hover{background:var(--red)}
-.rf-badge-edit{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);border:1px solid var(--teal);border-radius:99px;padding:3px 9px}
-.rf-badge-edit:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal)}
-.dark .rf-box,.dark .rf-mfoot{background:#0f2032}
-.dark .rf-field input,.dark .rf-field select,.dark .rf-field textarea{background:#142a3e;color:#e9f0f7;border-color:#30465a}
-.dark .rf-act{background:#142a3e;color:#9FCBF2;border-color:#30465a}
-.dark .rf-btn.ghost{background:#182f44;color:#cfe0f2}
-@media(max-width:760px){.rf-form{grid-template-columns:1fr}}
 </style></head><body>
 
 <div class="topbar">
@@ -234,14 +191,11 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
     <button class="btn ghost filttoggle" id="filttoggle">Filtros</button>
     <button class="btn ghost themebtn" id="cmd" title="Búsqueda rápida">⌘</button>
     <button class="btn ghost themebtn" id="theme" title="Modo claro u oscuro">◐</button>
-    <select class="role" id="role" title="Perfil de la sesión" disabled><option>Administrador</option><option>Obras</option><option>Inversiones</option><option>Planificación</option><option>Dirección</option><option>Consulta</option></select>
+    <select class="role" id="role" title="Vista según perfil"><option>Administrador</option><option>Obras</option><option>Inversiones</option><option>Dirección</option></select>
     <span class="gen" id="datestamp">Datos al 11 de agosto de 2026</span>
     <button class="btn teal" id="upload">Cargar planilla</button>
-    <button class="btn ghost" id="manual">Ingreso manual</button>
-    <button class="btn ghost" id="users">Usuarios</button>
     <button class="btn ghost" id="reports">Generar informe</button>
     <button class="btn" id="export">Exportar CSV</button>
-    <button class="btn ghost" id="logout">Cerrar sesión</button>
   </div>
   <div class="reportmenu" id="reportmenu">
     <button data-report="gerencial">Informe gerencial<small>KPIs, alertas y decisiones requeridas</small></button>
@@ -330,10 +284,7 @@ body.dark{--paper:#081421;--card:#0f2032;--ink:#e9f0f7;--muted:#8fa3b7;--line:#2
 <div class="scrim" id="scrim"></div>
 <div class="drawer" id="drawer"><div class="dhead" id="dhead"><h3></h3><button class="x" id="dclose">×</button></div><div class="dbody" id="dbody"></div></div>
 
-<div class="rf-modal" id="rfModal"><div class="rf-box"><div class="rf-mhead"><div><h3 id="rfTitle">Registro</h3><div class="sub" id="rfSub"></div></div><button class="rf-x" onclick="closeEditor()">✕</button></div><div class="rf-form" id="rfForm"></div><div class="rf-mfoot"><button class="rf-btn danger" id="rfDelete" style="display:none" onclick="rfDeleteCurrent()">🗑 Eliminar</button><div class="right"><button class="rf-btn ghost" onclick="closeEditor()">Cancelar</button><button class="rf-btn primary" onclick="saveEditor()">Guardar</button></div></div></div></div>
-<div class="rf-modal" id="rfConfirm"><div class="rf-box" style="width:min(470px,100%)"><div class="rf-mhead" style="background:linear-gradient(120deg,#a81c22,#da2a2e)"><div><h3>Confirmar eliminación</h3><div class="sub">Acción irreversible</div></div><button class="rf-x" onclick="rfConfirmCancel()">✕</button></div><div style="padding:22px;line-height:1.55" id="rfCText"></div><div class="rf-mfoot"><span></span><div class="right"><button class="rf-btn ghost" onclick="rfConfirmCancel()">Cancelar</button><button class="rf-btn danger" onclick="rfConfirmOk()">Sí, eliminar</button></div></div></div></div>
-
-<script>const D=__DASHBOARD_DATA__;const USER_ROLE=__USER_ROLE__;</script>
+<script>const D=__DASHBOARD_DATA__;</script>
 <script>
 const F={grupo:'',prov:'',comuna:'',tipo:'',etapa:'',estado:'',fin:'',rate:'',q:''};
 const convBips=new Set(D.convenio.map(c=>(c.bip||'').replace(/-0$/,'').trim()).filter(Boolean));
@@ -394,24 +345,22 @@ function hbars(sel,key,d,limit){
 }
 let sortKey='grupo',sortDir=1;
 function renderTable(d){
-  ensureUids(D.projects);
   const cols=[['grupo','Gr'],['nombre','Proyecto'],['comuna','Comuna'],['tipo','Tipo'],['etapa','Etapa'],['estado','Estado'],['fin','Financiam.'],['rate','RATE']];
   const s=[...d].sort((a,b)=>{const x=(a[sortKey]||''),y=(b[sortKey]||'');return x.localeCompare(y,'es')*sortDir;});
   $('#tcount').textContent=d.length+' proyecto'+(d.length!==1?'s':'');
-  let html='<thead><tr>'+cols.map(c=>`<th data-s="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir>0?' ▲':' ▼'):''}</th>`).join('')+(window._canEdit?'<th class="rf-acth">Acciones</th>':'')+'</tr></thead><tbody>';
+  let html='<thead><tr>'+cols.map(c=>`<th data-s="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir>0?' ▲':' ▼'):''}</th>`).join('')+'</tr></thead><tbody>';
+  if(!s.length){html+='</tbody>';$('#ptable').innerHTML=html;}
   s.forEach((p,i)=>{
     const conv=convBips.has((p.bip||'').replace(/-0$/,'').trim());
-    html+=`<tr data-i="${i}" data-uid="${p._uid}"><td><span class="gtag">${p.grupo||''}</span></td>`+
+    html+=`<tr data-i="${i}"><td><span class="gtag">${p.grupo||''}</span></td>`+
       `<td>${esc(p.nombre)}${conv?' <span class="chip" title="En convenio de programación" style="color:var(--red);border-color:var(--red)">CONV</span>':''}</td>`+
       `<td>${esc(p.comuna)||'—'}</td><td>${esc(p.tipo)||'—'}</td><td>${esc(p.etapa)||'—'}</td>`+
-      `<td>${esc(p.estado)||'—'}</td><td>${esc(p.fin)||'—'}</td><td><span class="chip">${esc(p.rate)||'—'}</span></td>`+
-      (window._canEdit?`<td class="rf-acts">${actBtns('proyecto',p._uid)}</td>`:'')+`</tr>`;
+      `<td>${esc(p.estado)||'—'}</td><td>${esc(p.fin)||'—'}</td><td><span class="chip">${esc(p.rate)||'—'}</span></td></tr>`;
   });
   html+='</tbody>';
   $('#ptable').innerHTML=html;
-  $('#ptable').querySelectorAll('th[data-s]').forEach(th=>th.onclick=()=>{const k=th.dataset.s;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}renderTable(d);});
-  $('#ptable').querySelectorAll('tbody tr').forEach(tr=>tr.onclick=e=>{if(e.target.closest('.rf-act'))return;openDrawer(s[+tr.dataset.i]);});
-  wireActs('#ptable');
+  $('#ptable').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.s;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}renderTable(d);});
+  $('#ptable').querySelectorAll('tbody tr').forEach(tr=>tr.onclick=()=>openDrawer(s[+tr.dataset.i]));
   $('#emptyc').style.display=s.length?'none':'block';
   window._filtered=s;
 }
@@ -446,16 +395,14 @@ function renderObras(){
   const btns=[['','Todos'],['g','Vigentes'],['a','Por vencer'],['r','Vencidos']];
   $('#sembtns').innerHTML=btns.map(b=>`<button class="sembtn ${obraF===b[0]?'act':''}" data-s="${b[0]}">${b[0]?`<span class="dot ${b[0]}"></span>`:''}${b[1]}</button>`).join('');
   $('#sembtns').querySelectorAll('.sembtn').forEach(b=>b.onclick=()=>{obraF=b.dataset.s;renderObras();});
-  ensureUids(D.obras);
   const show=rows.filter(r=>!obraF||r.c[0]===obraF);
-  let h='<thead><tr><th>Establecimiento</th><th>Proyecto / Contrato</th><th>Responsable</th><th>Término</th><th>Días</th><th>Contrato</th><th>G. Fiel Cumpl.</th><th>G. Resp. Civil</th><th>Siguiente etapa</th>'+(window._canEdit?'<th class="rf-acth">Acciones</th>':'')+'</tr></thead><tbody>';
-  show.forEach(({o,c,gfc,grc})=>{h+=`<tr data-uid="${o._uid}"><td>${esc(o.est)||'—'}</td><td>${esc(o.proy)}</td><td>${esc((o.resp||'').replace(/\n/g,' / '))||'—'}</td><td>${esc(o.term)||'—'}</td><td>${esc(o.dias)||'—'}</td>`+
+  let h='<thead><tr><th>Establecimiento</th><th>Proyecto / Contrato</th><th>Responsable</th><th>Término</th><th>Días</th><th>Contrato</th><th>G. Fiel Cumpl.</th><th>G. Resp. Civil</th><th>Siguiente etapa</th></tr></thead><tbody>';
+  show.forEach(({o,c,gfc,grc})=>{h+=`<tr><td>${esc(o.est)||'—'}</td><td>${esc(o.proy)}</td><td>${esc((o.resp||'').replace(/\n/g,' / '))||'—'}</td><td>${esc(o.term)||'—'}</td><td>${esc(o.dias)||'—'}</td>`+
     `<td><span class="sem-txt ${c[0]}"><span class="dot ${c[0]}"></span>${c[1]}</span></td>`+
     `<td><span class="sem-txt ${gfc[0]}"><span class="dot ${gfc[0]}"></span>${esc(o.gfc)||'—'}</span></td>`+
     `<td><span class="sem-txt ${grc[0]}"><span class="dot ${grc[0]}"></span>${esc(o.grc)||'—'}</span></td>`+
-    `<td>${esc(o.sigetapa)||'—'}</td>`+(window._canEdit?`<td class="rf-acts">${actBtns('obra',o._uid)}</td>`:'')+`</tr>`;});
+    `<td>${esc(o.sigetapa)||'—'}</td></tr>`;});
   h+='</tbody>';$('#otable').innerHTML=h;
-  wireActs('#otable');
   $('#ocount').textContent=show.length+' contrato'+(show.length!==1?'s':'');
 }
 
@@ -465,10 +412,9 @@ function renderConv(q=''){
   const rows=D.convenio.filter(c=>!q||(c.proy||'').toLowerCase().includes(q)||(c.bip||'').toLowerCase().includes(q)||(c.compromiso||'').toLowerCase().includes(q));
   $('#ckpis').innerHTML=[['Compromisos',D.convenio.length,''],['Con Cód. BIP',D.convenio.filter(c=>c.bip).length,''],['Ciclo','Nov 25 – Oct 26','']]
     .map((k,i)=>`<div class="kpi ${i===2?'':''}" ${i===2?'style="grid-column:span 4"':''}><div class="n" ${i===2?'style="font-size:1.1rem"':''}>${k[1]}</div><div class="l">${k[0]}</div></div>`).join('');
-  ensureUids(D.convenio);
-  let h='<thead><tr><th style="width:44px">#</th><th>Proyecto</th><th>Cód. BIP</th><th>Compromiso a Octubre 2026</th>'+(window._canEdit?'<th class="rf-acth">Acciones</th>':'')+'</tr></thead><tbody>';
-  rows.forEach(c=>{h+=`<tr data-uid="${c._uid}"><td><span class="chip">${esc(c.item)}</span></td><td>${esc(c.proy)}</td><td><span class="chip">${esc(c.bip)||'—'}</span></td><td style="max-width:420px">${esc(c.compromiso)||'—'}</td>`+(window._canEdit?`<td class="rf-acts">${actBtns('convenio',c._uid)}</td>`:'')+`</tr>`;});
-  h+='</tbody>';$('#ctable').innerHTML=h;wireActs('#ctable');$('#ccount').textContent=rows.length+' compromiso'+(rows.length!==1?'s':'');
+  let h='<thead><tr><th style="width:44px">#</th><th>Proyecto</th><th>Cód. BIP</th><th>Compromiso a Octubre 2026</th></tr></thead><tbody>';
+  rows.forEach(c=>{h+=`<tr><td><span class="chip">${esc(c.item)}</span></td><td>${esc(c.proy)}</td><td><span class="chip">${esc(c.bip)||'—'}</span></td><td style="max-width:420px">${esc(c.compromiso)||'—'}</td></tr>`;});
+  h+='</tbody>';$('#ctable').innerHTML=h;$('#ccount').textContent=rows.length+' compromiso'+(rows.length!==1?'s':'');
 }
 
 /* ---- CSV export ---- */
@@ -505,15 +451,78 @@ function openCommand(){$('#command').classList.add('open');$('#commandinput').va
 function closeCommand(){$('#command').classList.remove('open')}
 function loadFile(file){const reader=new FileReader();reader.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];importRows(XLSX.utils.sheet_to_json(ws,{defval:null}));}catch(err){notify('No fue posible cargar la planilla: '+err.message)}};reader.readAsArrayBuffer(file)}
 
-/* ---- informes imprimibles ---- */
+/* ---- informes gerenciales imprimibles ---- */
 function report(type){
-  const d=filtered(), now=new Date().toLocaleDateString('es-CL'), counts=k=>d.reduce((a,p)=>(a[p[k]||'Sin dato']=(a[p[k]||'Sin dato']||0)+1,a),{});
-  let title='Informe Gerencial de Recursos Físicos', intro='Síntesis ejecutiva para apoyar decisiones de Dirección.', rows=d;
-  if(type==='obras'){title='Informe Técnico de Obras y Contratos';intro='Estado contractual, vigencias, garantías, hitos y contingencias técnicas.';rows=d.filter(p=>/obra/i.test(p.enc||'')||/ejecuci|operaci/i.test(p.etapa||''));}
-  if(type==='inversiones'){title='Informe de Inversiones';intro='Cartera por etapa, RATE, financiamiento, territorio y estado de avance.';rows=d.filter(p=>!/operación/i.test(p.etapa||''));}
-  const critical=rows.filter(p=>/espera|reeval|venc|termino|término|sin rate/i.test((p.estado||'')+' '+(p.rate||''))).length;
-  const top=Object.entries(counts('estado')).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${title}</title><style>body{font:14px Arial;color:#17243a;margin:38px}header{border-bottom:4px solid #DA2A2E;padding-bottom:18px}h1{color:#0C2E5E;margin:5px 0}.meta{color:#687386}.k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.k div{border:1px solid #dce3ec;border-top:3px solid #1E6FBF;padding:15px}.k b{display:block;font-size:26px;color:#0C2E5E}h2{color:#0C2E5E;margin-top:26px}table{width:100%;border-collapse:collapse;font-size:11px}th{background:#0C2E5E;color:white;text-align:left}th,td{padding:7px;border:1px solid #dce3ec}ul{line-height:1.7}.note{background:#E9F1FA;padding:14px;border-left:4px solid #DA2A2E}@media print{button{display:none}}</style></head><body><header><small>SERVICIO DE SALUD METROPOLITANO OCCIDENTE · RECURSOS FÍSICOS</small><h1>${title}</h1><div class="meta">Fecha de corte: ${now} · Perfil: ${$('#role').value} · ${intro}</div></header><section class="k"><div><b>${rows.length}</b>proyectos analizados</div><div><b>${rows.filter(p=>p.rate==='RS').length}</b>con RATE RS</div><div><b>${critical}</b>señales de atención</div></section><h2>Lectura ejecutiva</h2><div class="note">La cartera debe priorizar las iniciativas con esperas externas, reevaluaciones, vencimientos y brechas de financiamiento. El detalle siguiente mantiene trazabilidad con el código BIP y el responsable informado.</div><h2>Estados predominantes</h2><ul>${top.map(x=>`<li><b>${esc(x[0])}:</b> ${x[1]} iniciativa(s)</li>`).join('')}</ul><h2>Detalle de cartera</h2><table><thead><tr><th>Proyecto</th><th>BIP</th><th>Comuna</th><th>Etapa</th><th>Estado</th><th>Financiamiento</th><th>Responsable</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${esc(p.nombre)}</td><td>${esc(p.bip)||'—'}</td><td>${esc(p.comuna)||'—'}</td><td>${esc(p.etapa)||'—'}</td><td>${esc(p.estado)||'—'}</td><td>${esc(p.fin)||'—'}</td><td>${esc(p.enc)||'—'}</td></tr>`).join('')}</tbody></table><p class="meta">Documento generado automáticamente desde el Panel de Recursos Físicos SSMOC.</p><button onclick="print()">Imprimir / Guardar PDF</button></body></html>`;
+  const portfolio=filtered(), now=D.gen||new Date().toLocaleDateString('es-CL');
+  const logo=document.querySelector('.brand img')?.src||'';
+  const pct=(n,d)=>d?`${Math.round(n/d*100)}%`:'0%';
+  const countBy=(rows,key)=>Object.entries(rows.reduce((a,p)=>{const v=(p[key]||'Sin información').trim()||'Sin información';a[v]=(a[v]||0)+1;return a;},{})).sort((a,b)=>b[1]-a[1]);
+  const riskText=p=>`${p.estado||''} ${p.rate||''} ${p.etapa||''} ${p.coment||''}`.toLowerCase();
+  const isRisk=p=>/espera|pendiente|observ|reeval|venc|atras|deten|sin rate|sin financ|rechaz|desiert|incumpl/.test(riskText(p));
+  const isActive=p=>/ejecuci|inversión|licit|adjud|obra|operaci/.test(`${p.etapa||''} ${p.estado||''}`.toLowerCase());
+  const hasData=(p,key)=>String(p[key]||'').trim().length>0;
+  const topRows=(rows,key,n=6)=>countBy(rows,key).slice(0,n);
+  const barRows=(items,total)=>items.map(([label,value])=>`<tr><td>${esc(label)}</td><td class="num">${value}</td><td class="num">${pct(value,total)}</td><td><span class="bar"><i style="width:${pct(value,total)}"></i></span></td></tr>`).join('');
+  const riskLabel=p=>/venc|atras|deten|rechaz|incumpl/.test(riskText(p))?'Crítico':/espera|pendiente|observ|reeval|sin rate|sin financ|desiert/.test(riskText(p))?'Atención':'Seguimiento';
+
+  let title='Informe Gerencial de Recursos Físicos', subtitle='Visión integrada de cartera, desempeño, riesgos y decisiones requeridas', rows=portfolio;
+  let specialty='Cartera integral';
+  if(type==='inversiones'){
+    title='Informe Gerencial de Inversiones'; subtitle='Desempeño de iniciativas, madurez, RATE, financiamiento y cobertura territorial';
+    rows=portfolio.filter(p=>!/operación/i.test(p.etapa||'')); specialty='Inversiones';
+  }
+  if(type==='obras'){
+    title='Informe Técnico Gerencial de Obras y Contratos'; subtitle='Continuidad contractual, vencimientos, garantías y próximos hitos';
+    specialty='Obras y contratos';
+  }
+
+  const obras=D.obras.map(o=>({o,c:semDias(o.dias),gfc:semDate(o.gfc),grc:semDate(o.grc)}));
+  const total=type==='obras'?obras.length:rows.length;
+  const risks=type==='obras'?obras.filter(x=>x.c[0]==='r'||x.c[0]==='a'||x.gfc[0]==='r'||x.gfc[0]==='a'||x.grc[0]==='r'||x.grc[0]==='a'):rows.filter(isRisk);
+  const rs=rows.filter(p=>String(p.rate||'').toUpperCase()==='RS').length;
+  const active=rows.filter(isActive).length;
+  const withBip=rows.filter(p=>hasData(p,'bip')).length;
+  const withResp=rows.filter(p=>hasData(p,'enc')).length;
+  const inAgreement=rows.filter(p=>convBips.has((p.bip||'').replace(/-0$/,'').trim())).length;
+  const expired=obras.filter(x=>x.c[0]==='r').length;
+  const expiring=obras.filter(x=>x.c[0]==='a').length;
+  const guaranteeRisk=obras.filter(x=>['r','a'].includes(x.gfc[0])||['r','a'].includes(x.grc[0])).length;
+  const kpis=type==='obras'?
+    [['Contratos monitoreados',total,'Universo informado'],['Contratos vigentes',obras.filter(x=>x.c[0]==='g').length,pct(obras.filter(x=>x.c[0]==='g').length,total)],['Por vencer (≤30 días)',expiring,pct(expiring,total)],['Contratos vencidos',expired,pct(expired,total),'red'],['Garantías en riesgo',guaranteeRisk,pct(guaranteeRisk,total),'amber'],['Con responsable',obras.filter(x=>x.o.resp).length,pct(obras.filter(x=>x.o.resp).length,total)]]:
+    [['Iniciativas analizadas',total,'Universo filtrado'],['En gestión activa',active,pct(active,total)],['Con RATE RS',rs,pct(rs,total)],['Con código BIP',withBip,pct(withBip,total)],['En convenio',inAgreement,pct(inAgreement,total)],['Alertas detectadas',risks.length,pct(risks.length,total),'red'],['Responsable informado',withResp,pct(withResp,total)],['Cobertura comunal',new Set(rows.map(p=>p.comuna).filter(Boolean)).size,'comunas']];
+
+  const statusTop=type==='obras'?countBy(obras.map(x=>({status:x.c[1]})),'status').slice(0,6):topRows(rows,'estado');
+  const territoryTop=type==='obras'?countBy(obras.map(x=>({territory:x.o.est||'Sin establecimiento'})),'territory').slice(0,6):topRows(rows,'comuna');
+  const dominant=statusTop[0]||['Sin información',0];
+  const health=total?Math.max(0,Math.round(100-(risks.length/total*60)-(type==='obras'?guaranteeRisk/total*25:0))):0;
+  const healthClass=health>=80?'green':health>=60?'amber':'red';
+  const executive=total===0?'No existen registros para los filtros seleccionados. Se recomienda revisar el alcance del corte antes de distribuir el informe.':
+    type==='obras'?`La cartera contractual registra ${total} contrato(s). ${expired} se encuentran vencidos y ${expiring} vencen dentro de 30 días. Además, ${guaranteeRisk} presentan garantías vencidas o próximas a vencer. La prioridad gerencial es asegurar continuidad operacional, responsables y evidencia de renovación.`:
+    `La cartera analizada contiene ${total} iniciativa(s), de las cuales ${active} se encuentran en gestión activa. ${rs} cuentan con RATE RS y ${risks.length} presentan señales que requieren seguimiento. El estado más frecuente es “${esc(dominant[0])}” (${dominant[1]} iniciativas). La gestión debe concentrarse en destrabar dependencias, completar información crítica y formalizar próximos hitos.`;
+  const decisions=type==='obras'?[
+    ['Continuidad contractual',`${expired+expiring} contrato(s) vencidos o próximos a vencer`,'Validar estrategia de renovación, nueva contratación o cierre, con responsable y fecha.'],
+    ['Cobertura de garantías',`${guaranteeRisk} garantía(s) requieren atención`,'Regularizar vigencias y respaldos antes de mantener exposición contractual.'],
+    ['Trazabilidad de hitos',`${obras.filter(x=>!x.o.sigetapa).length} registro(s) sin siguiente etapa`,'Completar hito, plazo y evidencia de cumplimiento.']
+  ]:[
+    ['Gestión de alertas',`${risks.length} iniciativa(s) con señal de riesgo`,'Asignar acción, responsable y fecha comprometida para cada caso prioritario.'],
+    ['Madurez de inversión',`${total-rs} iniciativa(s) sin RATE RS`,'Definir ruta de subsanación, reevaluación o cierre de brechas técnicas.'],
+    ['Calidad de datos',`${total-withResp} sin responsable y ${total-withBip} sin BIP`,'Completar campos críticos para asegurar trazabilidad y rendición.']
+  ];
+  const alerts=type==='obras'?risks.slice(0,12).map(x=>({name:x.o.proy,territory:x.o.est,status:`Contrato: ${x.c[1]} · GFC: ${x.gfc[1]} · GRC: ${x.grc[1]}`,owner:x.o.resp,next:x.o.sigetapa,level:(x.c[0]==='r'||x.gfc[0]==='r'||x.grc[0]==='r')?'Crítico':'Atención'})):
+    risks.slice().sort((a,b)=>riskLabel(a).localeCompare(riskLabel(b))).slice(0,12).map(p=>({name:p.nombre,territory:p.comuna,status:p.estado||p.etapa,owner:p.enc,next:p.coment,level:riskLabel(p)}));
+  const detail=type==='obras'?obras.map(x=>`<tr><td>${esc(x.o.proy)}</td><td>${esc(x.o.est)||'-'}</td><td>${esc(x.o.resp)||'-'}</td><td>${esc(x.o.term)||'-'}</td><td><span class="tag ${x.c[0]==='r'?'red':x.c[0]==='a'?'amber':'green'}">${x.c[1]}</span></td><td>${esc(x.o.sigetapa)||'-'}</td></tr>`).join(''):
+    rows.map(p=>`<tr><td>${esc(p.nombre)}</td><td>${esc(p.bip)||'-'}</td><td>${esc(p.comuna)||'-'}</td><td>${esc(p.etapa)||'-'}</td><td>${esc(p.estado)||'-'}</td><td>${esc(p.fin)||'-'}</td><td>${esc(p.enc)||'-'}</td></tr>`).join('');
+  const filters=Object.entries(F).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join(' · ')||'Cartera completa sin filtros adicionales';
+
+  const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${title}</title><style>
+  @page{size:A4;margin:16mm 14mm 15mm}*{box-sizing:border-box}body{font:10.5px Arial,sans-serif;color:#17243a;margin:0;background:#eef3f8}.sheet{width:210mm;min-height:297mm;margin:12px auto;background:#fff;padding:16mm 14mm 15mm;box-shadow:0 8px 32px #b8c3d0;position:relative}.cover{background:linear-gradient(145deg,#082349 0%,#0C4C97 62%,#1E6FBF 100%);color:#fff;display:flex;flex-direction:column}.cover:before{content:'';position:absolute;left:0;top:0;width:8mm;height:100%;background:#DA2A2E}.brand{display:flex;align-items:flex-start;justify-content:space-between}.brand img{width:47mm;height:auto;background:white}.brand .unit{text-align:right;font-size:9px;line-height:1.55;text-transform:uppercase;letter-spacing:.08em;color:#c6d9ec}.covermain{margin:auto 0;padding-left:5mm;max-width:160mm}.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#a9cee9;font-weight:bold}.cover h1{font-size:30px;line-height:1.08;margin:10px 0 8px;letter-spacing:-.03em}.cover h2{font-size:15px;color:#fff;font-weight:normal;margin:0;line-height:1.45}.covermeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;border-top:1px solid #ffffff55;padding:16px 0 0;margin-top:28px}.covermeta b,.covermeta span{display:block}.covermeta b{font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#9fc8e7;margin-bottom:5px}.covermeta span{font-size:11px}.conf{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#c6d9ec}.head{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #DA2A2E;padding-bottom:8px;margin-bottom:15px}.head img{width:31mm}.head .right{text-align:right}.head b{display:block;color:#0C2E5E;font-size:12px}.head span{font-size:8px;color:#687386}.footer{position:absolute;left:14mm;right:14mm;bottom:7mm;border-top:1px solid #dce3ec;padding-top:5px;display:flex;justify-content:space-between;color:#687386;font-size:7.5px}.section-title{color:#0C2E5E;font-size:16px;margin:18px 0 4px}.section-sub{color:#687386;margin-bottom:11px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kpi{border:1px solid #dce3ec;border-top:3px solid #1E6FBF;border-radius:4px;padding:10px;min-height:65px}.kpi.red{border-top-color:#DA2A2E}.kpi.amber{border-top-color:#D99B18}.kpi strong{display:block;font-size:21px;color:#0C2E5E;line-height:1}.kpi label{display:block;font-size:7.5px;text-transform:uppercase;letter-spacing:.05em;color:#687386;margin:6px 0 2px}.kpi small{color:#687386}.summary{display:grid;grid-template-columns:1fr 37mm;gap:12px;margin:14px 0}.note{background:#E9F1FA;border-left:4px solid #DA2A2E;padding:12px;line-height:1.55}.score{border:1px solid #dce3ec;text-align:center;padding:9px}.score strong{display:block;font-size:28px;color:#0C2E5E}.score span{display:inline-block;padding:3px 8px;border-radius:12px;color:white;font-weight:bold}.green{background:#178A55!important;color:#fff}.amber{background:#B27A08!important;color:#fff}.red{background:#DA2A2E!important;color:#fff}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.card{border:1px solid #dce3ec;padding:10px;border-radius:4px}.card h3{font-size:11px;color:#0C2E5E;margin:0 0 8px}.decision{border-left:4px solid #1E6FBF;padding:8px 10px;margin-bottom:7px;background:#F4F7FB}.decision b,.decision span,.decision small{display:block}.decision b{color:#0C2E5E}.decision span{font-weight:bold;margin:2px 0}.decision small{line-height:1.35;color:#5A6779}table{width:100%;border-collapse:collapse;font-size:8.2px}th{background:#0C2E5E;color:#fff;text-align:left;font-size:7px;text-transform:uppercase;letter-spacing:.04em}th,td{padding:5px 6px;border:1px solid #dce3ec;vertical-align:top}tbody tr:nth-child(even){background:#F7F9FC}.num{text-align:right;white-space:nowrap}.bar{display:block;height:5px;background:#e8eef5;border-radius:4px;min-width:35px}.bar i{display:block;height:100%;background:#1E6FBF;border-radius:4px}.tag{display:inline-block;padding:2px 5px;border-radius:9px;font-size:7px;font-weight:bold}.alert-table td:first-child{font-weight:bold;color:#0C2E5E}.method{font-size:8px;line-height:1.5;color:#5A6779}.method b{color:#0C2E5E}.pagebreak{page-break-before:always}.no-break{break-inside:avoid}.actionbar{position:fixed;right:18px;bottom:18px;z-index:20}.actionbar button{border:0;background:#DA2A2E;color:#fff;padding:11px 16px;border-radius:6px;font-weight:bold;box-shadow:0 5px 20px #0004}@media print{body{background:#fff}.sheet{margin:0;box-shadow:none;width:auto;min-height:265mm;padding:0}.cover{min-height:265mm;padding:0 0 0 8mm}.actionbar{display:none}.pagebreak{page-break-before:always}}
+  </style></head><body>
+  <section class="sheet cover"><div class="brand"><img src="${logo}" alt="SSMOC"><div class="unit">Servicio de Salud Metropolitano Occidente<br>Subdirección de Recursos Físicos y Financieros<br>Departamento de Recursos Físicos</div></div><div class="covermain"><div class="eyebrow">Reporte institucional para toma de decisiones</div><h1>${title}</h1><h2>${subtitle}</h2><div class="covermeta"><div><b>Fecha de corte</b><span>${esc(now)}</span></div><div><b>Ámbito</b><span>${specialty}</span></div><div><b>Universo</b><span>${total} registro(s)</span></div></div></div><div class="conf">Documento de gestión interna · Generado desde información vigente del sistema</div></section>
+  <section class="sheet pagebreak"><div class="head"><img src="${logo}" alt="SSMOC"><div class="right"><b>Resumen ejecutivo</b><span>Fecha de corte: ${esc(now)} · Perfil: ${esc($('#role').value)}</span></div></div><h2 class="section-title">1. Tablero de desempeño</h2><div class="section-sub">Indicadores calculados sobre el universo seleccionado. Cada porcentaje muestra su denominador efectivo.</div><div class="kpis">${kpis.map(k=>`<div class="kpi ${k[3]||''}"><strong>${k[1]}</strong><label>${k[0]}</label><small>${k[2]}</small></div>`).join('')}</div><div class="summary"><div class="note"><b>Lectura gerencial.</b> ${executive}</div><div class="score"><small>Índice de control</small><strong>${health}/100</strong><span class="${healthClass}">${health>=80?'Controlado':health>=60?'En atención':'Crítico'}</span></div></div><div class="grid2"><div class="card"><h3>Distribución por estado</h3><table><thead><tr><th>Estado</th><th>N</th><th>%</th><th>Distribución</th></tr></thead><tbody>${barRows(statusTop,total)}</tbody></table></div><div class="card"><h3>${type==='obras'?'Establecimientos con mayor carga':'Cobertura territorial'}</h3><table><thead><tr><th>${type==='obras'?'Establecimiento':'Comuna'}</th><th>N</th><th>%</th><th>Distribución</th></tr></thead><tbody>${barRows(territoryTop,total)}</tbody></table></div></div><h2 class="section-title">2. Decisiones requeridas</h2><div class="grid2"><div>${decisions.map(d=>`<div class="decision"><b>${d[0]}</b><span>${d[1]}</span><small>${d[2]}</small></div>`).join('')}</div><div class="card"><h3>Criterio recomendado de priorización</h3><ol class="method"><li>Riesgo de continuidad operacional o contractual.</li><li>Vencimiento con plazo menor o igual a 30 días.</li><li>Dependencia externa u observación sin resolver.</li><li>Ausencia de responsable, BIP, hito o respaldo.</li><li>Impacto territorial y relevancia para la Red.</li></ol></div></div><div class="footer"><span>SSMOC · Informe automático de Recursos Físicos</span><span>Página 2 · Resumen ejecutivo</span></div></section>
+  <section class="sheet pagebreak"><div class="head"><img src="${logo}" alt="SSMOC"><div class="right"><b>Riesgos y plan de acción</b><span>${esc(now)}</span></div></div><h2 class="section-title">3. Radar de alertas prioritarias</h2><div class="section-sub">Selección automática de hasta 12 casos según palabras de alerta, vencimientos y estado de garantías.</div><table class="alert-table"><thead><tr><th>Prioridad</th><th>Proyecto / contrato</th><th>Territorio / establecimiento</th><th>Situación</th><th>Responsable</th><th>Acción o siguiente hito</th></tr></thead><tbody>${alerts.map(a=>`<tr><td><span class="tag ${a.level==='Crítico'?'red':'amber'}">${a.level}</span></td><td>${esc(a.name)||'-'}</td><td>${esc(a.territory)||'-'}</td><td>${esc(a.status)||'-'}</td><td>${esc(a.owner)||'Por asignar'}</td><td>${esc(a.next)||'Definir acción, plazo y evidencia'}</td></tr>`).join('')||'<tr><td colspan="6">No se detectaron alertas automáticas con los criterios vigentes.</td></tr>'}</tbody></table><h2 class="section-title">4. Plan gerencial de corto plazo</h2><table><thead><tr><th>Horizonte</th><th>Acción mínima</th><th>Producto verificable</th><th>Responsable sugerido</th></tr></thead><tbody><tr><td>0-10 días</td><td>Validar alertas críticas y depurar registros incompletos.</td><td>Matriz priorizada con responsable y fecha.</td><td>Jefatura de unidad</td></tr><tr><td>11-30 días</td><td>Resolver vencimientos, observaciones y dependencias externas.</td><td>Oficio, acta, renovación o pronunciamiento.</td><td>Encargado de iniciativa</td></tr><tr><td>31-60 días</td><td>Revisar avance contra compromisos y reprogramar desviaciones.</td><td>Minuta de seguimiento y cronograma actualizado.</td><td>Mesa de Recursos Físicos</td></tr><tr><td>Trimestral</td><td>Evaluar tendencia de KPI y calidad de datos.</td><td>Informe comparativo con acuerdos de Dirección.</td><td>Departamento de Recursos Físicos</td></tr></tbody></table><div class="footer"><span>SSMOC · Informe automático de Recursos Físicos</span><span>Página 3 · Riesgos y acciones</span></div></section>
+  <section class="sheet pagebreak"><div class="head"><img src="${logo}" alt="SSMOC"><div class="right"><b>Detalle trazable</b><span>${esc(filters)}</span></div></div><h2 class="section-title">5. Detalle del universo analizado</h2><div class="section-sub">El detalle permite verificar los indicadores y mantener trazabilidad con el registro fuente.</div><table><thead>${type==='obras'?'<tr><th>Proyecto / contrato</th><th>Establecimiento</th><th>Responsable</th><th>Término</th><th>Semáforo</th><th>Siguiente etapa</th></tr>':'<tr><th>Proyecto</th><th>BIP</th><th>Comuna</th><th>Etapa</th><th>Estado</th><th>Financiamiento</th><th>Responsable</th></tr>'}</thead><tbody>${detail||'<tr><td colspan="7">Sin registros para el alcance seleccionado.</td></tr>'}</tbody></table><div class="footer"><span>SSMOC · Informe automático de Recursos Físicos</span><span>Página 4 · Detalle de cartera</span></div></section>
+  <section class="sheet pagebreak"><div class="head"><img src="${logo}" alt="SSMOC"><div class="right"><b>Ficha metodológica</b><span>Control y trazabilidad</span></div></div><h2 class="section-title">6. Definiciones de KPI</h2><table><thead><tr><th>Indicador</th><th>Definición / fórmula</th><th>Uso gerencial</th></tr></thead><tbody><tr><td>Gestión activa</td><td>Iniciativas con etapa o estado asociado a ejecución, inversión, licitación, adjudicación, obra u operación / total.</td><td>Mide movilización efectiva de la cartera.</td></tr><tr><td>RATE RS</td><td>Iniciativas cuyo campo RATE es igual a RS / total de iniciativas.</td><td>Monitorea madurez técnico-económica.</td></tr><tr><td>Alertas</td><td>Registros que contienen criterios de espera, observación, reevaluación, vencimiento, atraso, detención, carencia de RATE o financiamiento.</td><td>Orienta revisión prioritaria; requiere validación humana.</td></tr><tr><td>Índice de control</td><td>100 menos penalización proporcional por alertas y, en Obras, garantías expuestas.</td><td>Semáforo sintético; no reemplaza el análisis técnico.</td></tr><tr><td>Calidad de datos</td><td>Proporción de registros con responsable y código BIP informados.</td><td>Asegura trazabilidad y asignación de acciones.</td></tr><tr><td>Continuidad contractual</td><td>Clasificación según días restantes: vencido, por vencer (≤30 días) o vigente.</td><td>Anticipa interrupciones y renovaciones.</td></tr></tbody></table><h2 class="section-title">7. Alcance y limitaciones</h2><div class="note method"><b>Fuente:</b> Panel de Recursos Físicos SSMOC y registros vigentes al ${esc(now)}.<br><b>Alcance aplicado:</b> ${esc(filters)}.<br><b>Regla de interpretación:</b> los cálculos dependen de la completitud y estandarización de los campos de origen. Las alertas automáticas son señales de gestión y deben ser confirmadas por la unidad responsable antes de adoptar una decisión administrativa, financiera o contractual.<br><b>Trazabilidad:</b> el código BIP, responsable, estado, fechas y comentarios deben mantenerse actualizados para que el informe refleje la situación efectiva.</div><h2 class="section-title">8. Conclusión gerencial</h2><div class="note">Se recomienda utilizar este informe como pauta de la reunión de seguimiento: validar primero los casos críticos, registrar acuerdos con responsable y plazo, y comparar la evolución de los KPI en el siguiente corte. El objetivo no es solo describir la cartera, sino convertir sus brechas en decisiones verificables.</div><div class="footer"><span>SSMOC · Documento de gestión interna</span><span>Página 5 · Metodología y cierre</span></div></section>
+  <div class="actionbar"><button onclick="print()">Imprimir / Guardar como PDF</button></div></body></html>`;
   const w=open('','_blank');w.document.write(html);w.document.close();
 }
 
@@ -530,18 +539,13 @@ function init(){
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{tab(t.dataset.t);if(t.dataset.t==='obras')renderObras();if(t.dataset.t==='conv')renderConv();});
   $('#scrim').onclick=closeDrawer;$('#dclose').onclick=closeDrawer;
   $('#export').onclick=exportCSV;
-  const APP='__APP_BASE_URL__';
-  const openApp=view=>window.open(APP+'?view='+view,'_blank','noopener');
-  $('#logout').onclick=()=>window.open(APP+'?logout=1','_blank','noopener');
-  $('#upload').onclick=()=>openApp('administracion');
-  $('#manual').onclick=()=>openApp('nuevo');
-  $('#users').onclick=()=>openApp('administracion&tab=usuarios');
+  $('#upload').onclick=()=>notify('La carga centralizada se realiza desde Administración.');
   $('#reports').onclick=e=>{e.stopPropagation();$('#reportmenu').classList.toggle('open')};
   $('#reportmenu').querySelectorAll('button').forEach(b=>b.onclick=()=>{report(b.dataset.report);$('#reportmenu').classList.remove('open')});document.addEventListener('click',()=>$('#reportmenu').classList.remove('open'));
   $('#role').onchange=e=>{const v=e.target.value;if(v==='Obras')tab('obras');else if(v==='Inversiones')tab('cartera');else if(v==='Dirección')tab('conv');notify('Vista ajustada al perfil '+v+'.')};
   $('#theme').onclick=()=>{document.body.classList.toggle('dark');localStorage.setItem('ssmoc_theme',document.body.classList.contains('dark')?'dark':'light')};if(localStorage.getItem('ssmoc_theme')==='dark')document.body.classList.add('dark');
   $('#cmd').onclick=openCommand;$('#command').onclick=e=>{if(e.target===$('#command'))closeCommand()};$('#commandinput').oninput=e=>commandSearch(e.target.value);document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCommand()}if(e.key==='Escape')closeCommand()});
-  $('#heroUpload').onclick=()=>openApp('administracion');$('#heroReport').onclick=()=>report('gerencial');
+  $('#heroUpload').onclick=()=>notify('La carga centralizada se realiza desde Administración.');$('#heroReport').onclick=()=>report('gerencial');
   document.querySelectorAll('.decision').forEach(d=>d.onclick=()=>{tab('cartera');F.q=d.dataset.query;$('#f_q').value=F.q;render();document.querySelector('.tablewrap').scrollIntoView({behavior:'smooth',block:'start'})});
   $('#filttoggle').onclick=()=>$('#side').classList.toggle('open');
   $('#cvsearch').oninput=e=>renderConv(e.target.value);
@@ -549,142 +553,5 @@ function init(){
   render();
 }
 document.addEventListener('DOMContentLoaded',init);
-</script>
-<script>
-/* ============================================================
-   Capa de autogestión (CRUD in-panel) · Recursos Físicos SSMOC
-   Crea, edita y elimina Proyectos, Obras y Compromisos sin salir
-   del panel. Persiste en el navegador (localStorage).
-   ============================================================ */
-const RF_META={proyecto:{arr:'projects',title:'Proyecto',label:'la cartera',nameKey:'nombre'},
-               obra:{arr:'obras',title:'Obra / Contrato',label:'obras',nameKey:'proy'},
-               convenio:{arr:'convenio',title:'Compromiso de convenio',label:'el convenio',nameKey:'proy'}};
-const RF_FIELDS={
-  proyecto:[
-    {k:'nombre',l:'Nombre del proyecto',req:true,full:true},
-    {k:'grupo',l:'Grupo',type:'select',opts:['','A','B','C','D','E','F','G']},
-    {k:'bip',l:'Cód. BIP'},{k:'enc',l:'Encargado / unidad'},
-    {k:'prov',l:'Provincia'},{k:'comuna',l:'Comuna'},
-    {k:'tipo',l:'Tipo establecimiento'},{k:'cat',l:'Categoría'},
-    {k:'m2',l:'M²'},{k:'etapa',l:'Etapa actual'},{k:'rate',l:'RATE'},
-    {k:'estado',l:'Estado'},{k:'fin',l:'Financiamiento'},
-    {k:'coment',l:'Comentario ejecutivo',type:'textarea',full:true},
-  ],
-  obra:[
-    {k:'proy',l:'Proyecto / Contrato',req:true,full:true},
-    {k:'est',l:'Establecimiento'},{k:'resp',l:'Responsable'},
-    {k:'term',l:'Término de contrato',type:'date'},{k:'dias',l:'Días restantes',type:'number'},
-    {k:'estado',l:'Estado'},{k:'gfc',l:'Garantía fiel cumpl.',type:'date'},
-    {k:'grc',l:'Garantía resp. civil',type:'date'},
-    {k:'sigetapa',l:'Siguiente etapa',type:'textarea',full:true},
-  ],
-  convenio:[
-    {k:'proy',l:'Proyecto',req:true,full:true},
-    {k:'item',l:'Ítem N°'},{k:'bip',l:'Cód. BIP'},
-    {k:'compromiso',l:'Compromiso a Octubre 2026',type:'textarea',full:true},
-  ],
-};
-const RF_KEY='ssmoc_rf_data_v3';
-window._uidSeq=1;
-function ensureUids(arr){(arr||[]).forEach(x=>{if(x&&x._uid==null)x._uid='u'+(window._uidSeq++);});}
-function getArr(k){return D[RF_META[k].arr]||(D[RF_META[k].arr]=[]);}
-function findByUid(k,u){return getArr(k).find(x=>String(x._uid)===String(u));}
-function actBtns(kind,uid){return `<button class="rf-act edit" data-k="${kind}" data-u="${uid}" title="Editar">✎</button><button class="rf-act del" data-k="${kind}" data-u="${uid}" title="Eliminar">🗑</button>`;}
-function wireActs(sel){document.querySelectorAll(sel+' .rf-act').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.k,u=b.dataset.u;b.classList.contains('del')?rfAskDelete(k,u):openEditor(k,u);});}
-
-/* --- persistencia local --- */
-function persist(){try{localStorage.setItem(RF_KEY,JSON.stringify({projects:D.projects,obras:D.obras,convenio:D.convenio,ts:Date.now()}));}catch(e){}}
-function loadLocal(){try{const raw=localStorage.getItem(RF_KEY);if(!raw)return false;const o=JSON.parse(raw);if(o&&Array.isArray(o.projects)){D.projects=o.projects;D.obras=o.obras||[];D.convenio=o.convenio||[];return true;}}catch(e){}return false;}
-window._serverData=JSON.parse(JSON.stringify({projects:D.projects||[],obras:D.obras||[],convenio:D.convenio||[]}));
-loadLocal();
-ensureUids(D.projects);ensureUids(D.obras);ensureUids(D.convenio);
-function restoreServer(){rfConfirm('Se restaurarán los datos originales del servidor y se descartarán los cambios locales guardados en este navegador. Esta acción no se puede deshacer.',()=>{const s=window._serverData;D.projects=JSON.parse(JSON.stringify(s.projects));D.obras=JSON.parse(JSON.stringify(s.obras));D.convenio=JSON.parse(JSON.stringify(s.convenio));try{localStorage.removeItem(RF_KEY);}catch(e){}ensureUids(D.projects);ensureUids(D.obras);ensureUids(D.convenio);rfRerender();notify('Datos restaurados desde el servidor.');});}
-function rfBackup(){const blob=new Blob([JSON.stringify({projects:D.projects,obras:D.obras,convenio:D.convenio},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo_recursos_fisicos.json';a.click();notify('Respaldo descargado.');}
-
-/* --- permisos de edición según perfil --- */
-function computeCanEdit(){window._canEdit=['Administrador','Obras','Inversiones','Planificación'].includes(USER_ROLE);}
-computeCanEdit();
-
-/* --- editor (crear/editar) --- */
-let rfEditing={kind:null,uid:null};
-function openEditor(kind,uid){
-  rfEditing={kind,uid:uid||null};
-  const rec=uid?(findByUid(kind,uid)||{}):{};
-  const meta=RF_META[kind];
-  document.getElementById('rfTitle').textContent=(uid?'Editar ':'Nuevo ')+meta.title.toLowerCase();
-  document.getElementById('rfSub').textContent=uid?String(rec[meta.nameKey]||'').slice(0,64):'Complete los campos y guarde';
-  document.getElementById('rfForm').innerHTML=RF_FIELDS[kind].map(f=>{
-    const v=rec[f.k]==null?'':String(rec[f.k]);
-    const lab=`<label>${f.l}${f.req?' <span class="req">*</span>':''}</label>`;
-    let ctl;
-    if(f.type==='select')ctl=`<select data-k="${f.k}">${f.opts.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
-    else if(f.type==='textarea')ctl=`<textarea data-k="${f.k}">${esc(v)}</textarea>`;
-    else if(f.type==='date')ctl=`<input type="date" data-k="${f.k}" value="${/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''}">`;
-    else if(f.type==='number')ctl=`<input type="number" data-k="${f.k}" value="${esc(v)}">`;
-    else ctl=`<input type="text" data-k="${f.k}" value="${esc(v)}">`;
-    return `<div class="rf-field ${f.full?'full':''}">${lab}${ctl}</div>`;
-  }).join('');
-  document.getElementById('rfDelete').style.display=uid?'inline-flex':'none';
-  document.getElementById('rfModal').classList.add('open');
-}
-function closeEditor(){document.getElementById('rfModal').classList.remove('open');}
-function saveEditor(){
-  const kind=rfEditing.kind,meta=RF_META[kind],data={};
-  document.getElementById('rfForm').querySelectorAll('[data-k]').forEach(el=>data[el.dataset.k]=el.value.trim());
-  if(!data[meta.nameKey]){notify('El nombre del '+meta.title.toLowerCase()+' es obligatorio.');return;}
-  if(kind==='obra'){
-    if(data.term&&/^\d{4}-\d{2}-\d{2}$/.test(data.term)&&!data.dias)data.dias=String(Math.round((new Date(data.term)-TODAY)/86400000));
-    if(!data.gfc)data.gfc='N/A';if(!data.grc)data.grc='N/A';
-  }
-  if(rfEditing.uid){Object.assign(findByUid(kind,rfEditing.uid),data);notify('Registro actualizado correctamente.');}
-  else{
-    if(kind==='convenio'&&!data.item){const mx=Math.max(0,...getArr('convenio').map(c=>parseInt(c.item)||0));data.item=String(mx+1);}
-    data._uid='u'+(window._uidSeq++);getArr(kind).push(data);notify('Registro creado correctamente.');
-  }
-  persist();closeEditor();rfRerender();
-}
-function rfDeleteCurrent(){if(rfEditing.uid){const k=rfEditing.kind,u=rfEditing.uid;closeEditor();rfAskDelete(k,u);}}
-
-/* --- eliminación con confirmación --- */
-let rfPending=null;
-function rfAskDelete(kind,uid){const rec=findByUid(kind,uid);const nm=(rec&&(rec[RF_META[kind].nameKey]))||'este registro';rfConfirm('Se eliminará «'+nm+'» de '+RF_META[kind].label+'. Esta acción no se puede deshacer.',()=>{const arr=getArr(kind),i=arr.findIndex(x=>String(x._uid)===String(uid));if(i>=0)arr.splice(i,1);persist();rfRerender();notify('Registro eliminado.');});}
-function rfConfirm(msg,onOk){document.getElementById('rfCText').textContent=msg;rfPending=onOk;document.getElementById('rfConfirm').classList.add('open');}
-function rfConfirmOk(){document.getElementById('rfConfirm').classList.remove('open');if(rfPending){const f=rfPending;rfPending=null;f();}}
-function rfConfirmCancel(){document.getElementById('rfConfirm').classList.remove('open');rfPending=null;}
-
-/* --- re-render tras cambios (preserva filtros) --- */
-function rfRerender(){try{rebuildFilters();syncSelects();}catch(e){}render();try{renderObras();}catch(e){}try{renderConv((document.getElementById('cvsearch')||{}).value||'');}catch(e){}}
-
-/* --- botones "+ Nuevo" por pestaña --- */
-function injectNewButtons(){
-  [['#panel-cartera .tabletop','proyecto','Nuevo proyecto'],['#panel-obras .tabletop','obra','Nueva obra'],['#panel-conv .tabletop','convenio','Nuevo compromiso']].forEach(([sel,kind,label])=>{
-    const t=document.querySelector(sel);if(!t||t.querySelector('.rf-new'))return;
-    const h=t.querySelector('h3');const b=document.createElement('button');
-    b.className='rf-new';b.innerHTML='<b>+</b> '+label;b.onclick=()=>openEditor(kind,null);
-    if(h){const w=document.createElement('div');w.style.cssText='display:flex;align-items:center;gap:12px;min-width:0';h.parentNode.insertBefore(w,h);w.appendChild(h);w.appendChild(b);}else t.appendChild(b);
-  });
-}
-function updateNewButtons(){document.querySelectorAll('.rf-new').forEach(b=>b.style.display=window._canEdit?'inline-flex':'none');}
-function updateSessionActions(){
-  const admin=USER_ROLE==='Administrador';
-  const upload=document.getElementById('upload'),users=document.getElementById('users'),manual=document.getElementById('manual');
-  if(upload)upload.style.display=admin?'inline-flex':'none';
-  if(users)users.style.display=admin?'inline-flex':'none';
-  if(manual)manual.style.display=window._canEdit?'inline-flex':'none';
-}
-
-/* --- editar/eliminar desde el detalle (drawer) --- */
-const _rfOpenDrawer=window.openDrawer;
-window.openDrawer=function(p){_rfOpenDrawer(p);const dh=document.getElementById('dhead');if(!dh)return;const old=dh.querySelector('.rf-drawer-actions');if(old)old.remove();if(window._canEdit&&p&&p._uid!=null){const bar=document.createElement('div');bar.className='rf-drawer-actions';bar.innerHTML='<button class="edit">✎ Editar</button><button class="del">🗑 Eliminar</button>';bar.querySelector('.edit').onclick=()=>{closeDrawer();openEditor('proyecto',p._uid);};bar.querySelector('.del').onclick=()=>{closeDrawer();rfAskDelete('proyecto',p._uid);};dh.insertBefore(bar,dh.querySelector('.x'));}};
-
-/* --- init de la capa (tras el init original) --- */
-document.addEventListener('DOMContentLoaded',()=>{
-  const roleSel=document.getElementById('role');
-  if(roleSel){roleSel.value=USER_ROLE;roleSel.disabled=true;}
-  injectNewButtons();updateNewButtons();updateSessionActions();
-  const rm=document.getElementById('reportmenu');
-  if(rm&&!document.getElementById('rfBackup')){rm.insertAdjacentHTML('beforeend','<button id="rfBackup" type="button">Descargar respaldo (JSON)<small>Copia de seguridad de los datos actuales</small></button><button id="rfRestore" type="button">Restaurar datos del servidor<small>Descarta los cambios locales de este navegador</small></button>');document.getElementById('rfBackup').onclick=rfBackup;document.getElementById('rfRestore').onclick=restoreServer;}
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeEditor();rfConfirmCancel();}});
-});
 </script>
 </body></html>
