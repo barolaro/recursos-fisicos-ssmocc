@@ -27,6 +27,9 @@ st.markdown("""
 [data-testid="stAppViewContainer"] > .main{margin-left:0!important}
 .block-container{max-width:1660px;padding-left:1rem;padding-right:1rem}
 .login-brand{text-align:center;padding:1rem .5rem .25rem}.login-brand img{width:150px;max-width:50%;border-radius:6px}.login-brand .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#1E6FBF;margin:.75rem 0 .35rem}.login-brand h1{font-size:1.65rem;line-height:1.15;color:#082349;margin:0}.login-brand p{color:#687386;margin:.55rem 0}.login-foot{text-align:center;color:#7A8699;font-size:.72rem;padding:.4rem 0 0}
+.st-key-open_integrated_upload{position:fixed;right:365px;top:15px;z-index:999999;width:172px}.st-key-open_integrated_upload button{min-height:39px;border-radius:8px!important;background:#DA2A2E!important;border:1px solid #DA2A2E!important;color:white!important;font-size:.72rem!important;font-weight:800!important;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 7px 18px rgba(12,46,94,.2)}
+div[data-testid="stDialog"]{z-index:1000000}div[data-testid="stDialog"] [data-testid="stVerticalBlock"]{gap:.7rem}
+@media(max-width:1050px){.st-key-open_integrated_upload{right:115px}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -167,6 +170,112 @@ def model_workbook(kind: str) -> bytes:
     return output.getvalue()
 
 
+@st.dialog("Actualizar cartera de Recursos Físicos", width="large")
+def integrated_upload_dialog(actor: str, current_projects: pd.DataFrame) -> None:
+    """Carga y valida uno o más libros sin abandonar el panel principal."""
+    st.caption(
+        "Cargue la Matriz completa, la Planilla de Inversiones y/o la Planilla "
+        "de Obras. Los archivos se validan antes de modificar la base central."
+    )
+    uploaded_files = st.file_uploader(
+        "Arrastre aquí sus planillas Excel",
+        type=["xlsx"],
+        accept_multiple_files=True,
+        key="integrated_workbooks",
+        help="Puede seleccionar los tres archivos en una sola operación.",
+    )
+    if not uploaded_files:
+        st.info("Seleccione al menos un archivo .xlsx para iniciar la validación.")
+        st.markdown(
+            "**Formatos reconocidos:** Matriz multihoja, Planilla de Inversiones "
+            "y Planilla de Obras. El tipo se determina por sus hojas y encabezados."
+        )
+        return
+
+    parsed_frames: list[pd.DataFrame] = []
+    file_results: list[dict] = []
+    errors: list[str] = []
+    for uploaded in uploaded_files:
+        try:
+            frame = parse_workbook(uploaded.getvalue())
+            parsed_frames.append(frame)
+            file_results.append({
+                "Archivo": uploaded.name,
+                "Resultado": "Validado",
+                "Registros": len(frame),
+                "Obras": int((frame["owner_unit"] == "Obras").sum()),
+                "Inversiones": int((frame["owner_unit"] == "Inversiones").sum()),
+                "Convenio": int((frame["owner_unit"] == "Convenio").sum()),
+            })
+        except Exception as exc:
+            errors.append(f"{uploaded.name}: {exc}")
+            file_results.append({
+                "Archivo": uploaded.name, "Resultado": "Con observaciones",
+                "Registros": 0, "Obras": 0, "Inversiones": 0, "Convenio": 0,
+            })
+
+    st.markdown("#### Resultado de validación")
+    st.dataframe(pd.DataFrame(file_results), hide_index=True, use_container_width=True)
+    if errors:
+        for error in errors:
+            st.error(error)
+    if not parsed_frames:
+        st.warning("Ninguno de los archivos contiene una estructura reconocible.")
+        return
+
+    combined = pd.concat(parsed_frames, ignore_index=True).reindex(columns=PROJECT_COLUMNS)
+    duplicate_count = int(combined.duplicated(subset="id", keep="last").sum())
+    combined = combined.drop_duplicates(subset="id", keep="last").reset_index(drop=True)
+    existing_ids = set(current_projects.get("id", pd.Series(dtype=str)).dropna().astype(str))
+    incoming_ids = set(combined["id"].dropna().astype(str))
+    new_count = len(incoming_ids - existing_ids)
+    update_count = len(incoming_ids & existing_ids)
+    obras_n = int((combined["owner_unit"] == "Obras").sum())
+    inversiones_n = int((combined["owner_unit"] == "Inversiones").sum())
+    planificacion_n = int((combined["owner_unit"] == "Planificación").sum())
+    convenio_n = int((combined["owner_unit"] == "Convenio").sum())
+
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Registros válidos", len(combined))
+    m2.metric("Nuevos", new_count)
+    m3.metric("A actualizar", update_count)
+    m4.metric("Duplicados consolidados", duplicate_count)
+    st.caption(
+        f"Distribución: {inversiones_n} Inversiones · {obras_n} Obras · "
+        f"{planificacion_n} Planificación · {convenio_n} Convenio."
+    )
+    preview_columns = ["grupo", "bip", "name", "stage", "status", "owner_unit", "responsible"]
+    st.dataframe(
+        combined[preview_columns].head(60), hide_index=True,
+        use_container_width=True, height=310,
+    )
+    if len(combined) > 60:
+        st.caption(f"Se muestran 60 de {len(combined)} registros validados.")
+
+    replace_demo = st.checkbox("Eliminar registros de demostración después de cargar")
+    confirmed = st.checkbox(
+        "Confirmo que revisé el resumen y deseo actualizar la base central.",
+        key="confirm_integrated_upload",
+    )
+    left, right = st.columns([1, 1])
+    if left.button(
+        "Confirmar actualización", type="primary", use_container_width=True,
+        disabled=not confirmed or bool(errors),
+    ):
+        with st.spinner("Actualizando Google Sheets y registrando el historial..."):
+            upsert_projects(combined, actor)
+            if replace_demo:
+                delete_demo_projects()
+        st.session_state["integrated_upload_success"] = (
+            f"Carga finalizada: {len(combined)} registros procesados, "
+            f"{new_count} nuevos y {update_count} actualizados."
+        )
+        st.cache_data.clear()
+        st.rerun()
+    if right.button("Cancelar", use_container_width=True):
+        st.rerun()
+
+
 init_db()
 if str(st.query_params.get("logout", "")) == "1":
     st.session_state.pop("auth_user", None)
@@ -244,6 +353,11 @@ if user["role"] not in {"Administrador", "Dirección", "Consulta"} and user.get(
     data = data[data["owner_unit"].fillna("").str.lower() == user["unit"].lower()]
 
 if section == "Panel visual HTML":
+    if st.session_state.pop("integrated_upload_success", None) is not None:
+        st.toast("La cartera fue actualizada correctamente.", icon="✅")
+    if user["role"] == "Administrador":
+        if st.button("Actualizar cartera", key="open_integrated_upload"):
+            integrated_upload_dialog(email, data)
     render_html_dashboard(data, str(user["role"]))
 
 elif section == "Resumen ejecutivo":
